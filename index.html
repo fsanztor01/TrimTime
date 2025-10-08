@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trim Time - Premium Barbershop Appointment Management</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-layout">
+            <!-- Botón Modo Claro/Oscuro -->
+            <button id="themeToggle" class="icon-btn" aria-label="Toggle theme">
+                <span class="icon">🌙</span>
+            </button>
+
+            <!-- Logo centrado -->
+            <div class="logo">
+                <img src="./images/TrimTime.png" alt="Trim Time Logo" class="logo-img"
+                    style="width: 50px; border-radius: 50px;">
+            </div>
+
+            <!-- Botón Idioma -->
+            <button id="langToggle" class="icon-btn" aria-label="Toggle language">
+                <span class="icon">🇬🇧</span>
+            </button>
+
+            <!-- Botón Admin (solo visible si es admin) -->
+            <button id="adminNavBtn" class="icon-btn admin-only" aria-label="Admin">
+                <span class="icon">⚙️</span>
+                <span class="label">Administrar</span>
+
+            </button>
+
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Login Page -->
+        <section id="loginPage" class="page active">
+            <div class="container">
+                <div class="auth-container">
+                    <div class="auth-form">
+                        <div class="auth-logo">
+                            <img src="./images/TrimTime NObg.png" alt="Trim Time Logo" class="auth-logo-img"
+                                style="width: 50px; border-radius: 50px;">
+                        </div>
+                        <h2 data-i18n="login.title">Sign In</h2>
+                        <form id="loginForm">
+                            <div class="form-group">
+                                <label for="loginEmail" data-i18n="login.email">Email</label>
+                                <input type="email" id="loginEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="loginPassword" data-i18n="login.password">Password</label>
+                                <input type="password" id="loginPassword" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" data-i18n="login.submit">Sign In</button>
+                        </form>
+                        <p class="auth-switch">
+                            <span data-i18n="login.noAccount">Don't have an account?</span>
+                            <button type="button" id="showRegister" class="link-btn"
+                                data-i18n="login.register">Register</button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Register Page -->
+        <section id="registerPage" class="page">
+            <div class="container">
+                <div class="auth-container">
+                    <div class="auth-form">
+                        <div class="auth-logo">
+                            <img src="./images/TrimTime NObg.png" alt="Trim Time Logo" class="auth-logo-img"
+                                style="width: 50px; border-radius: 50px;">
+                        </div>
+                        <h2 data-i18n="register.title">Create Account</h2>
+                        <form id="registerForm">
+                            <div class="form-group">
+                                <label for="registerName" data-i18n="register.name">Full Name</label>
+                                <input type="text" id="registerName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="registerEmail" data-i18n="register.email">Email</label>
+                                <input type="email" id="registerEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="registerPhone" data-i18n="register.phone">Phone</label>
+                                <input type="tel" id="registerPhone" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="registerPassword" data-i18n="register.password">Password</label>
+                                <input type="password" id="registerPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="registerRole" data-i18n="register.role">Account Type</label>
+                                <select id="registerRole">
+                                    <option value="client" data-i18n="register.client">Client</option>
+                                    <option value="admin" data-i18n="register.admin">Admin</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary" data-i18n="register.submit">Create
+                                Account</button>
+                        </form>
+                        <p class="auth-switch">
+                            <span data-i18n="register.hasAccount">Already have an account?</span>
+                            <button type="button" id="showLogin" class="link-btn" data-i18n="register.login">Sign
+                                In</button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Client Home Page -->
+        <section id="clientHomePage" class="page">
+            <div class="container">
+                <div class="shop-info">
+                    <div class="shop-image">
+                        <img src="images/Barbershop.png" alt="Barbershop" class="shop-img">
+                    </div>
+                    <div class="shop-details">
+                        <h2 data-i18n="home.welcome">Welcome, <span id="clientName"></span></h2>
+                        <p class="shop-description" data-i18n="home.description">
+                            Trim Time is a premium barbershop offering traditional and modern grooming services.
+                            Our experienced barbers provide exceptional haircuts, shaves, and styling in a relaxed,
+                            professional atmosphere. We use only the finest products and techniques to ensure you
+                            leave looking and feeling your best.
+                        </p>
+                        <div class="shop-address">
+                            <h3 data-i18n="home.addressTitle">Visit Us</h3>
+                            <p data-i18n="home.address">123 Main Street, Downtown, City 12345</p>
+                            <p data-i18n="home.hours">Mon-Fri: 9am-7pm, Sat: 9am-5pm, Sun: Closed</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Barbers Section -->
+                <div class="barbers-section">
+                    <h3 data-i18n="home.barbersTitle">Our Barbers</h3>
+                    <div id="barbersList" class="barbers-list">
+                        <!-- Barbers will be dynamically added here -->
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <div class="action-card" id="bookAppointmentBtn">
+                        <div class="action-icon">📅</div>
+                        <h3 data-i18n="home.bookAppointment">Book Appointment</h3>
+                        <p data-i18n="home.bookAppointmentDesc">Schedule your next visit</p>
+                    </div>
+                    <div class="action-card" id="viewServicesBtn">
+                        <div class="action-icon">✂️</div>
+                        <h3 data-i18n="home.viewServices">View Services</h3>
+                        <p data-i18n="home.viewServicesDesc">Explore our offerings</p>
+                    </div>
+                    <div class="action-card" id="myAppointmentsBtn">
+                        <div class="action-icon">📋</div>
+                        <h3 data-i18n="home.myAppointments">My Appointments</h3>
+                        <p data-i18n="home.myAppointmentsDesc">Manage your bookings</p>
+                    </div>
+                </div>
+
+                <!-- Social Media Buttons -->
+                <div class="quick-actions">
+                    <div class="action-card social-card map-btn"
+                        onclick="window.open('https://maps.app.goo.gl/dr1R39qidFXhv19r9', '_blank')">
+                        <div class="action-icon">
+                            <img src="./images/Google-Maps.png" alt="Ubicación" class="icon-img">
+                        </div>
+                        <h3 data-i18n="home.location">Location</h3>
+                    </div>
+                    <div class="action-card social-card instagram-btn"
+                        onclick="window.open('https://www.instagram.com/trimtime', '_blank')">
+                        <div class="action-icon">
+                            <img src="./images/instagram.png" alt="Instagram" class="icon-img">
+                        </div>
+                        <h3>Instagram</h3>
+                    </div>
+                    <div class="action-card social-card whatsapp-btn"
+                        onclick="window.open('https://wa.me/1234567890?text=Hi%20there!%20I\'d%20like%20to%20book%20an%20appointment.', '_blank')">
+                        <div class="action-icon">
+                            <img src="./images/whatsapp.png" alt="WhatsApp" class="icon-img">
+                        </div>
+                        <h3>WhatsApp</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Page -->
+        <section id="servicesPage" class="page">
+            <div class="container">
+                <h2 data-i18n="services.title">Our Services</h2>
+                <div id="servicesList" class="services-grid">
+                    <!-- Services will be dynamically added here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Book Appointment Page -->
+        <section id="bookAppointmentPage" class="page">
+            <div class="container">
+                <h2 data-i18n="booking.title">Book Appointment</h2>
+                <div class="booking-steps">
+                    <div class="step active" id="step1">
+                        <h3 data-i18n="booking.selectService">Select Service</h3>
+                        <div id="serviceSelection" class="service-selection">
+                            <!-- Services will be dynamically added here -->
+                        </div>
+                    </div>
+                    <div class="step" id="step2">
+                        <h3 data-i18n="booking.selectBarber">Select Barber</h3>
+                        <div id="barberSelection" class="barber-selection">
+                            <!-- Barbers will be dynamically added here -->
+                        </div>
+                    </div>
+                    <div class="step" id="step3">
+                        <h3 data-i18n="booking.selectDateTime">Select Date & Time</h3>
+                        <div id="dateTimeSelection" class="datetime-selection">
+                            <div id="calendar" class="calendar">
+                                <!-- Calendar will be dynamically generated -->
+                            </div>
+                            <div id="timeSlots" class="time-slots">
+                                <!-- Time slots will be dynamically generated -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step" id="step4">
+                        <h3 data-i18n="booking.confirm">Confirm Booking</h3>
+                        <div id="bookingSummary" class="booking-summary">
+                            <!-- Booking summary will be dynamically generated -->
+                        </div>
+                        <button id="confirmBooking" class="btn btn-primary" data-i18n="booking.confirmBtn">Confirm
+                            Booking</button>
+                        <button id="bookAnother" class="btn btn-secondary" data-i18n="booking.bookAnother"
+                            style="display: none;">Book Another Appointment</button>
+                    </div>
+                </div>
+                <div class="booking-navigation">
+                    <button id="prevStep" class="btn btn-secondary" disabled data-i18n="booking.prev">Previous</button>
+                    <button id="nextStep" class="btn btn-primary" data-i18n="booking.next">Next</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- My Appointments Page -->
+        <section id="myAppointmentsPage" class="page">
+            <div class="container">
+                <h2 data-i18n="appointments.title">My Appointments</h2>
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="upcoming"
+                        data-i18n="appointments.upcoming">Upcoming</button>
+                    <button class="tab-btn" data-tab="history" data-i18n="appointments.history">History</button>
+                </div>
+                <div class="tab-content">
+                    <div id="upcomingTab" class="tab-pane active">
+                        <div id="upcomingAppointments" class="appointments-list">
+                            <!-- Upcoming appointments will be dynamically added here -->
+                        </div>
+                    </div>
+                    <div id="historyTab" class="tab-pane">
+                        <div id="appointmentHistory" class="appointments-list">
+                            <!-- Appointment history will be dynamically added here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Page -->
+        <section id="profilePage" class="page">
+            <div class="container">
+                <div class="profile-header">
+                    <h2 data-i18n="profile.title">My Profile</h2>
+                    <!-- Botón de Log Out agregado aquí -->
+                    <button id="logoutBtn" class="btn btn-danger" data-i18n="profile.logout">Log Out</button>
+                </div>
+                <div class="profile-content">
+                    <div class="profile-avatar">
+                        <img id="profilePhoto" src="https://picsum.photos/seed/avatar/150/150.jpg" alt="Profile Photo">
+                        <input type="file" id="photoInput" accept="image/*" style="display: none;">
+                        <button id="changePhotoBtn" class="btn btn-secondary" data-i18n="profile.changePhoto">Change
+                            Photo</button>
+                    </div>
+                    <form id="profileForm" class="profile-form">
+                        <div class="form-group">
+                            <label for="profileName" data-i18n="profile.name">Name</label>
+                            <input type="text" id="profileName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profileEmail" data-i18n="profile.email">Email</label>
+                            <input type="email" id="profileEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profilePhone" data-i18n="profile.phone">Phone</label>
+                            <input type="tel" id="profilePhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="prefBarber" data-i18n="profile.prefBarber">Preferred Barber</label>
+                            <select id="prefBarber">
+                                <option value="" data-i18n="profile.noPreference">No Preference</option>
+                                <!-- Barbers will be dynamically added here -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="prefService" data-i18n="profile.prefService">Preferred Service</label>
+                            <select id="prefService">
+                                <option value="" data-i18n="profile.noPreference">No Preference</option>
+                                <!-- Services will be dynamically added here -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="notifications">
+                                <span data-i18n="profile.notifications">Enable Notifications</span>
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary" data-i18n="profile.save">Save Changes</button>
+                    </form>
+                </div>
+
+                <div class="profile-sections">
+                    <div class="profile-section">
+                        <h3 data-i18n="profile.faq">FAQ</h3>
+                        <div class="accordion" id="faqAccordion">
+                            <!-- FAQ items will be dynamically added here -->
+                        </div>
+                    </div>
+
+                    <div class="profile-section">
+                        <h3 data-i18n="profile.contact">Contact Us</h3>
+                        <form id="contactForm" class="contact-form">
+                            <div class="form-group">
+                                <label for="contactSubject" data-i18n="profile.subject">Subject</label>
+                                <input type="text" id="contactSubject" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="contactMessage" data-i18n="profile.message">Message</label>
+                                <textarea id="contactMessage" rows="4" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary" data-i18n="profile.send">Send Message</button>
+                        </form>
+                    </div>
+
+                    <div class="profile-section">
+                        <h3 data-i18n="profile.rate">Rate Our App</h3>
+                        <div class="rating-container">
+                            <div class="rating-stars" id="ratingStars">
+                                <span class="star" data-rating="1">★</span>
+                                <span class="star" data-rating="2">★</span>
+                                <span class="star" data-rating="3">★</span>
+                                <span class="star" data-rating="4">★</span>
+                                <span class="star" data-rating="5">★</span>
+                            </div>
+                            <button id="submitRating" class="btn btn-primary" data-i18n="profile.submitRating">Submit
+                                Rating</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin Dashboard Page -->
+        <section id="adminDashboardPage" class="page">
+            <div class="container">
+                <div class="admin-logo">
+                    <img src="./images/TrimTime NObg.png" alt="Trim Time Logo" class="admin-logo-img"
+                        style="width: 100px; border-radius: 50px;">
+                </div>
+                <h2 data-i18n="admin.title">Admin Dashboard</h2>
+
+                <div class="admin-tabs">
+                    <button class="admin-tab-btn active" data-tab="calendar"
+                        data-i18n="admin.calendar">Calendar</button>
+                    <button class="admin-tab-btn" data-tab="appointments"
+                        data-i18n="admin.appointments">Appointments</button>
+                    <button class="admin-tab-btn" data-tab="services" data-i18n="admin.services">Services</button>
+                    <button class="admin-tab-btn" data-tab="barbers" data-i18n="admin.barbers">Barbers</button>
+                    <button class="admin-tab-btn" data-tab="stats" data-i18n="admin.stats">Statistics</button>
+                </div>
+
+                <div class="admin-tab-content">
+                    <div id="calendarTab" class="admin-tab-pane active">
+                        <div id="adminCalendar" class="admin-calendar">
+                            <!-- Admin calendar will be dynamically generated -->
+                        </div>
+                    </div>
+
+                    <div id="appointmentsTab" class="admin-tab-pane">
+                        <div class="admin-actions">
+                            <button id="filterAppointments" class="btn btn-secondary"
+                                data-i18n="admin.filter">Filter</button>
+                        </div>
+                        <div id="appointmentsList" class="admin-appointments-list">
+                            <!-- Appointments list will be dynamically generated -->
+                        </div>
+                    </div>
+
+                    <div id="servicesTab" class="admin-tab-pane">
+                        <div class="admin-actions">
+                            <button id="addServiceBtn" class="btn btn-primary" data-i18n="admin.addService">Add
+                                Service</button>
+                        </div>
+                        <div id="servicesManagement" class="admin-services-list">
+                            <!-- Services management will be dynamically generated -->
+                        </div>
+                    </div>
+
+                    <div id="barbersTab" class="admin-tab-pane">
+                        <div class="admin-actions">
+                            <button id="addBarberBtn" class="btn btn-primary" data-i18n="admin.addBarber">Add
+                                Barber</button>
+                        </div>
+                        <div id="barbersManagement" class="admin-barbers-list">
+                            <!-- Barbers management will be dynamically generated -->
+                        </div>
+                    </div>
+
+                    <div id="statsTab" class="admin-tab-pane">
+                        <div class="stats-container">
+                            <div class="stat-card">
+                                <h3 data-i18n="admin.totalAppointments">Total Appointments</h3>
+                                <p id="totalAppointmentsCount" class="stat-value">0</p>
+                            </div>
+
+                            <div class="stat-card">
+                                <h3 data-i18n="admin.confirmedAppointments">Confirmed</h3>
+                                <p id="confirmedAppointmentsCount" class="stat-value">0</p>
+                            </div>
+
+                            <div class="stat-card">
+                                <h3 data-i18n="admin.completedAppointments">Completed</h3>
+                                <p id="completedAppointmentsCount" class="stat-value">0</p>
+                            </div>
+
+                            <div class="stat-card">
+                                <h3 data-i18n="admin.cancellations">Cancellations</h3>
+                                <p id="cancellationsCount" class="stat-value">0</p>
+                                <p class="stat-detail">Rate: <span id="cancellationRate">0%</span></p>
+                            </div>
+
+                            <div class="stat-card">
+                                <h3 data-i18n="admin.totalRevenue">Total Revenue</h3>
+                                <p id="totalRevenue" class="stat-value">$0</p>
+                            </div>
+
+                            <div class="stat-card">
+                                <h3 data-i18n="admin.topServices">Top Services</h3>
+                                <ul id="topServicesList" class="stat-list">
+                                    <!-- Se llenará dinámicamente -->
+                                </ul>
+                            </div>
+
+                            <div class="stat-card">
+                                <h3 data-i18n="admin.peakHours">Peak Hours</h3>
+                                <ul id="peakHoursList" class="stat-list">
+                                    <!-- Se llenará dinámicamente -->
+                                </ul>
+                            </div>
+
+                            <div class="stat-card">
+                                <h3 data-i18n="admin.dateRange">Date Range</h3>
+                                <div class="date-range-filters">
+                                    <input type="date" id="statsDateFrom" class="form-control">
+                                    <input type="date" id="statsDateTo" class="form-control">
+                                    <button id="applyDateRange" class="btn btn-primary">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Service Modal -->
+        <div id="serviceModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <div id="serviceModalContent">
+                    <!-- Service details will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Barber Modal -->
+        <div id="barberModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <div id="barberModalContent">
+                    <!-- Barber details will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointment Modal -->
+        <div id="appointmentModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <div id="appointmentModalContent">
+                    <!-- Appointment details will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notification -->
+        <div id="toast" class="toast">
+            <span id="toastMessage"></span>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="loading-indicator" style="display: none;">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav id="bottomNav" class="bottom-nav hidden">
+        <button class="nav-btn" data-page="clientHomePage">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label" data-i18n="nav.home">Home</span>
+        </button>
+        <button class="nav-btn" data-page="myAppointmentsPage">
+            <span class="nav-icon">📋</span>
+            <span class="nav-label" data-i18n="nav.appointments">Appointments</span>
+        </button>
+
+        <button class="nav-btn main-btn" data-page="bookAppointmentPage">
+            <span class="nav-icon">📅</span>
+            <span class="nav-label" data-i18n="nav.book">Book</span>
+        </button>
+
+
+        <button class="nav-btn" data-page="servicesPage">
+            <span class="nav-icon">✂️</span>
+            <span class="nav-label" data-i18n="nav.services">Services</span>
+        </button>
+        <button class="nav-btn" data-page="profilePage">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label" data-i18n="nav.profile">Profile</span>
+        </button>
+
+        <!-- <button class="nav-btn admin-only" data-page="adminDashboardPage">
+            <span class="nav-icon">⚙️</span>
+            <span class="nav-label" data-i18n="nav.admin">Admin</span>
+        </button> -->
+    </nav>
+
+    <!-- Entry point script -->
+    <script type="module" src="js/app.js"></script>
+</body>
+
+</html>
