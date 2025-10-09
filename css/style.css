@@ -1,13 +1,9 @@
-/* CSS Variables for Theming */
+/* ===== CSS Variables for Theming ===== */
 :root {
     --primary-color: #D4AF37;
-    /* Gold */
     --secondary-color: #1E3A8A;
-    /* Blue */
     --bg-color: #121212;
-    /* Dark Black */
     --surface-color: #1E1E1E;
-    /* Slightly lighter black */
     --text-color: #FFFFFF;
     --text-secondary: #B0B0B0;
     --border-color: #333333;
@@ -20,10 +16,8 @@
 
 /* Light Theme */
 [data-theme="light"] {
-    --primary-color: #b89600;
-    /* Gold */
+    --primary-color: #cca700;
     --secondary-color: #ffc400;
-    /* Blue */
     --bg-color: #FFFFFF;
     --surface-color: #f3f3f3;
     --text-color: #121212;
@@ -32,7 +26,7 @@
     --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Base Styles */
+/* ===== Base Styles ===== */
 * {
     margin: 0;
     padding: 0;
@@ -53,7 +47,7 @@ body {
     padding: 0 20px;
 }
 
-/* Header */
+/* ===== Header ===== */
 .header {
     background-color: var(--surface-color);
     padding: 1rem 0;
@@ -61,45 +55,118 @@ body {
     position: sticky;
     top: 0;
     z-index: 100;
+}
+
+.header-layout {
     display: flex;
-    justify-content: space-between;
+    justify-content: center; /* Centrado de los elementos */
     align-items: center;
+    width: 100%;
 }
 
-.logo h1 {
-    color: var(--primary-color);
-    font-size: 1.8rem;
-    font-weight: 700;
-}
-
-.header-actions {
+.header-left {
+    flex: 0 0 auto;
     display: flex;
-    gap: 1rem;
+    align-items: center;
+    width: 60px; /* Espacio reservado para mantener equilibrio */
+}
+
+.header-center {
+    display: flex;
+    justify-content: center; /* Asegura que los elementos se centren */
+    align-items: center;
+    gap: 30px; /* Ajusta el espacio entre el logo y el icono */
+}
+.header-right {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 60px; /* Espacio reservado para el botón de admin */
+}
+
+.header-center .logo {
+    flex: 0 0 ;
 }
 
 .icon-btn {
     background: none;
     border: none;
     color: var(--text-color);
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     cursor: pointer;
     padding: 0.5rem;
     border-radius: 50%;
     transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .icon-btn:hover {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Main Content */
+.icon-btn .label {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+#adminNavBtn.active {
+    background-color: rgba(212, 175, 55, 0.2);
+    color: var(--primary-color);
+    border-radius: 8px;
+    padding: 0.4rem 0.8rem;
+}
+
+/* Admin button specific styles */
+#adminNavBtn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute; /* Mantiene el botón separado */
+    right: 20px; /* Posición a la derecha */
+    top: 50%; /* Centrando verticalmente */
+    transform: translateY(-50%); /* Ajuste fino para el centrado vertical */
+}
+
+#adminNavBtn .icon {
+    font-size: 1.3rem;
+}
+
+#adminNavBtn .label {
+    display: none; /* Ocultar etiqueta en móvil */
+}
+
+/* Mostrar etiqueta en pantallas más grandes */
+@media (min-width: 768px) {
+    #adminNavBtn .label {
+        display: inline;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .header-left,
+    .header-right {
+        width: 40px;
+    }
+    
+    .header-center {
+        gap: 0.5rem;
+    }
+    
+    .icon-btn {
+        padding: 0.4rem;
+        font-size: 1.3rem;
+    }
+}
+/* ===== Main Content ===== */
 .main {
     padding-bottom: 80px;
-    /* Space for bottom nav */
     min-height: calc(100vh - 120px);
 }
 
-/* Pages */
 .page {
     display: none;
     padding: 2rem 0;
@@ -115,14 +182,13 @@ body {
         opacity: 0;
         transform: translateY(20px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-/* Forms */
+/* ===== Forms ===== */
 .auth-container {
     display: flex;
     justify-content: center;
@@ -184,7 +250,7 @@ body {
     width: auto;
 }
 
-/* Buttons */
+/* ===== Buttons ===== */
 .btn {
     padding: 0.75rem 1.5rem;
     border: none;
@@ -230,7 +296,7 @@ body {
     cursor: not-allowed;
 }
 
-/* Auth Switch */
+/* ===== Auth Switch ===== */
 .auth-switch {
     text-align: center;
     margin-top: 1.5rem;
@@ -247,7 +313,21 @@ body {
     text-decoration: underline;
 }
 
-/* Shop Info */
+.link-btn {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+}
+
+.link-btn:hover {
+    text-decoration: underline;
+}
+
+/* ===== Shop Info ===== */
 .shop-info {
     margin-bottom: 2rem;
 }
@@ -291,7 +371,7 @@ body {
     margin-bottom: 0.5rem;
 }
 
-/* Social Buttons - Ajustados para coincidir con Ion Cards */
+/* ===== Social Buttons ===== */
 .social-buttons {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -381,7 +461,14 @@ body {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-/* Barbers Section - Ajustado para visualización horizontal */
+.icon-img {
+    width: 100px;
+    height: 90px;
+    object-fit: contain;
+    vertical-align: middle;
+}
+
+/* ===== Barbers Section ===== */
 .barbers-section {
     margin-top: 2rem;
     margin-bottom: 2rem;
@@ -449,7 +536,7 @@ body {
     margin-left: 0.25rem;
 }
 
-/* Quick Actions */
+/* ===== Quick Actions ===== */
 .quick-actions {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -486,7 +573,7 @@ body {
     color: var(--text-secondary);
 }
 
-/* Services */
+/* ===== Services ===== */
 .services-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -534,7 +621,7 @@ body {
     font-size: 0.9rem;
 }
 
-/* Booking Steps */
+/* ===== Booking Steps ===== */
 .booking-steps {
     margin-top: 2rem;
 }
@@ -559,7 +646,7 @@ body {
     margin-top: 2rem;
 }
 
-/* Service Selection */
+/* ===== Service Selection ===== */
 .service-selection,
 .barber-selection {
     display: grid;
@@ -588,7 +675,7 @@ body {
     background-color: rgba(212, 175, 55, 0.1);
 }
 
-/* Calendar */
+/* ===== Calendar ===== */
 .calendar {
     background-color: var(--surface-color);
     border-radius: 10px;
@@ -654,7 +741,7 @@ body {
     background-color: transparent;
 }
 
-/* Time Slots */
+/* ===== Time Slots ===== */
 .time-slots {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -689,7 +776,7 @@ body {
     background-color: transparent;
 }
 
-/* Booking Summary */
+/* ===== Booking Summary ===== */
 .booking-summary {
     background-color: var(--surface-color);
     padding: 1.5rem;
@@ -711,7 +798,7 @@ body {
     font-size: 1.1rem;
 }
 
-/* Appointments */
+/* ===== Appointments ===== */
 .tabs {
     display: flex;
     margin-bottom: 1.5rem;
@@ -818,7 +905,14 @@ body {
     flex-wrap: wrap;
 }
 
-/* Profile */
+/* ===== Profile ===== */
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 0;
+}
+
 .profile-content {
     display: grid;
     grid-template-columns: 1fr 2fr;
@@ -828,6 +922,7 @@ body {
 
 .profile-avatar {
     text-align: center;
+    margin-bottom: 2rem 0;
 }
 
 .profile-avatar img {
@@ -848,6 +943,7 @@ body {
 .profile-sections {
     display: grid;
     gap: 2rem;
+    margin-top: 2rem 0;
 }
 
 .profile-section {
@@ -861,7 +957,7 @@ body {
     margin-bottom: 1rem;
 }
 
-/* Accordion */
+/* ===== Accordion ===== */
 .accordion-item {
     margin-bottom: 0.5rem;
 }
@@ -903,7 +999,7 @@ body {
     padding: 1rem;
 }
 
-/* Rating */
+/* ===== Rating ===== */
 .rating-container {
     text-align: center;
 }
@@ -924,7 +1020,7 @@ body {
     color: var(--primary-color);
 }
 
-/* Admin Dashboard */
+/* ===== Admin Dashboard ===== */
 .admin-tabs {
     display: flex;
     margin-bottom: 1.5rem;
@@ -1012,7 +1108,7 @@ body {
     gap: 0.5rem;
 }
 
-/* Statistics */
+/* ===== Statistics ===== */
 .stats-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -1052,7 +1148,7 @@ body {
     border-bottom: none;
 }
 
-/* Modal */
+/* ===== Modal ===== */
 .modal {
     display: none;
     position: fixed;
@@ -1088,7 +1184,6 @@ body {
         transform: translateY(50px);
         opacity: 0;
     }
-
     to {
         transform: translateY(0);
         opacity: 1;
@@ -1108,7 +1203,7 @@ body {
     color: var(--text-color);
 }
 
-/* Toast Notification */
+/* ===== Toast Notification ===== */
 .toast {
     position: fixed;
     bottom: 100px;
@@ -1142,7 +1237,7 @@ body {
     border-left: 4px solid var(--warning-color);
 }
 
-/* Bottom Navigation */
+/* ===== Bottom Navigation ===== */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -1187,7 +1282,77 @@ body {
     font-size: 0.75rem;
 }
 
-/* Responsive Design */
+/* ===== Main Button ===== */
+.main-btn {
+    background-color: #b8941f8c;
+    color: var(--bg-color);
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    font-weight: 700;
+    transition: var(--transition);
+}
+
+.main-btn:hover {
+    background-color: #B8941F;
+    transform: translateY(-18px);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.4);
+}
+
+/* ===== Loading Indicator ===== */
+.loading-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid var(--border-color);
+    border-top: 5px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-indicator p {
+    color: var(--text-color);
+    font-size: 1.2rem;
+}
+
+/* ===== Page Specific Styles ===== */
+/* Asegura que solo se muestre en la home */
+#clientHomePage .social-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.page:not(#clientHomePage) .social-buttons {
+    display: none !important;
+}
+
+/* ===== Admin Only ===== */
+.admin-only {
+    display: none;
+}
+
+/* ===== Responsive Design ===== */
 @media (max-width: 768px) {
     .container {
         padding: 0 15px;
@@ -1266,7 +1431,7 @@ body {
     }
 }
 
-/* Accessibility */
+/* ===== Accessibility ===== */
 @media (prefers-reduced-motion: reduce) {
     * {
         animation-duration: 0.01ms !important;
@@ -1298,136 +1463,4 @@ textarea:focus {
 
 .skip-to-content:focus {
     top: 0;
-}
-
-.icon-img {
-    width: 100px;
-    height: 90px;
-    object-fit: contain;
-    vertical-align: middle;
-}
-
-/* Asegura que solo se muestre en la home */
-#clientHomePage .social-buttons {
-    display: flex;
-    /* o grid según tu diseño */
-    justify-content: center;
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.page:not(#clientHomePage) .social-buttons {
-    display: none !important;
-    /* oculta en cualquier otra página */
-}
-
-.header-layout {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-}
-
-.header .logo {
-    flex: 0 0 auto;
-}
-
-.header .icon-btn {
-    font-size: 1.5rem;
-}
-
-/* Loading Indicator */
-.loading-indicator {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-}
-
-.spinner {
-    width: 50px;
-    height: 50px;
-    border: 5px solid var(--border-color);
-    border-top: 5px solid var(--primary-color);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 1rem;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.loading-indicator p {
-    color: var(--text-color);
-    font-size: 1.2rem;
-}
-/* MEJORA: Añadir espaciado vertical en el perfil */
-.profile-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 2rem 0;
-}
-
-.profile-avatar {
-    margin-bottom: 2rem 0;
-}
-
-/* MEJORA: Añadir espaciado entre elementos del perfil */
-.profile-content {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.profile-sections {
-    margin-top: 2rem 0;
-}
-
-/* Botón principal destacado en el centro */
-.main-btn {
-    background-color: #b8941f8c ;
-    color: var(--bg-color);
-    border-radius: 20px; /* Bordes redondeados estilo cubo */
-    padding: 0.5rem 1rem;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-    font-weight: 700;
-    transition: var(--transition);
-}
-
-/* Efecto hover */
-.main-btn:hover {
-    background-color: #B8941F; /* tono más oscuro del gold */
-    transform: translateY(-18px);
-    box-shadow: 0 8px 18px rgba(0,0,0,0.4);
-}
-
-.header .icon-btn {
-    margin-left: 0.5rem;
-}
-
-.header-layout {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.header-layout .icon-btn {
-    margin-left: 0.5rem;
-}
-
-#adminNavBtn.active {
-    background-color: BLACK;
-    color: var(--primary-color);
-    border-radius: 8px;   /* <- cuadrado suave, puedes poner 0 para un cuadrado duro */
-    padding: 0.4rem 0.8rem;
 }

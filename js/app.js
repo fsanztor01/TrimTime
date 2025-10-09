@@ -105,6 +105,12 @@ async function initializeApp() {
     } else {
         showPage('loginPage');
         elements.bottomNav.classList.add('hidden');
+        
+        // Hide admin button when no user is logged in
+        const adminBtn = document.getElementById('adminNavBtn');
+        if (adminBtn) {
+            adminBtn.style.display = 'none';
+        }
     }
 
     // Set up event listeners
@@ -218,6 +224,7 @@ function setupEventListeners() {
 }
 
 // UI Navigation
+
 function showPage(pageId) {
     console.log('Showing page:', pageId);
 
@@ -265,18 +272,32 @@ function showPage(pageId) {
         renderHomePage();
         renderBarbers();
     }
+    
+    // Ensure admin button visibility is updated
+    const adminBtn = document.getElementById('adminNavBtn');
+    if (adminBtn) {
+        if (state.currentUser && state.currentUser.role === 'admin') {
+            adminBtn.style.display = 'flex';
+            if (pageId === 'adminDashboardPage') {
+                adminBtn.classList.add('active');
+            } else {
+                adminBtn.classList.remove('active');
+            }
+        } else {
+            adminBtn.style.display = 'none';
+        }
+    }
 }
 
 function updateNavigation() {
     if (state.currentUser) {
         elements.bottomNav.classList.remove('hidden');
 
-        // Admin engranaje arriba
+        // Admin button visibility
         const adminBtn = document.getElementById('adminNavBtn');
         if (adminBtn) {
             if (state.currentUser.role === 'admin') {
                 adminBtn.style.display = 'flex';
-                // marcarlo activo solo si estamos en la página de admin
                 if (state.currentPage === 'adminDashboardPage') {
                     adminBtn.classList.add('active');
                 } else {
@@ -296,6 +317,12 @@ function updateNavigation() {
         });
     } else {
         elements.bottomNav.classList.add('hidden');
+        
+        // Hide admin button when no user is logged in
+        const adminBtn = document.getElementById('adminNavBtn');
+        if (adminBtn) {
+            adminBtn.style.display = 'none';
+        }
     }
 }
 
