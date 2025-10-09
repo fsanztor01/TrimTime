@@ -588,7 +588,8 @@ function updateBookingStep() {
         elements.prevStep.disabled = state.currentBookingStep === 1;
     }
     if (elements.nextStep) {
-        elements.nextStep.disabled = state.currentBookingStep === 4;
+        // CORRECCIÓN: No deshabilitar el botón Next en el paso 4
+        elements.nextStep.disabled = state.currentBookingStep === 1;
     }
 
     // Render step content
@@ -750,51 +751,54 @@ async function cancelAppointment(appointmentId) {
     }
 }
 
+
 async function rescheduleAppointment(appointmentId) {
-    // Find the appointment
-    const result = await DatabaseService.getAppointments({
-        clientId: state.currentUser.id,
-        status: 'pending'
-    });
+    try {
+        // Obtener la cita actual
+        const result = await DatabaseService.getAppointments({
+            clientId: state.currentUser.id
+        });
 
-    if (result.success) {
-        const appointment = result.data.find(a => a.id === appointmentId);
+        if (result.success) {
+            const appointment = result.data.find(a => a.id === appointmentId);
 
-        if (appointment) {
-            // Cancel the current appointment
-            await DatabaseService.updateAppointment(appointmentId, { status: 'canceled' });
+            if (appointment) {
+                // NO cancelamos la cita actual todavía, solo la marcamos como "en reprogramación"
+                await DatabaseService.updateAppointment(appointmentId, { 
+                    status: 'rescheduling',
+                    originalStatus: appointment.status // Guardamos el estado original
+                });
 
-            // Pre-fill booking data with appointment details
-            const servicesResult = await DatabaseService.getServices(true);
-            const barbersResult = await DatabaseService.getBarbers(true);
+                // Pre-fill booking data con los detalles de la cita
+                const servicesResult = await DatabaseService.getServices(true);
+                const barbersResult = await DatabaseService.getBarbers(true);
 
-            if (servicesResult.success && barbersResult.success) {
-                const services = servicesResult.data;
-                const barbers = barbersResult.data;
+                if (servicesResult.success && barbersResult.success) {
+                    const services = servicesResult.data;
+                    const barbers = barbersResult.data;
 
-                state.bookingData.service = services.find(s => s.id === appointment.service_id);
-                state.bookingData.barber = barbers.find(b => b.id === appointment.employee_id);
+                    state.bookingData = {
+                        service: services.find(s => s.id === appointment.service_id),
+                        barber: barbers.find(b => b.id === appointment.employee_id),
+                        date: null, // No preseleccionamos fecha para que el usuario elija
+                        time: null,
+                        originalAppointmentId: appointmentId // Guardamos referencia a la cita original
+                    };
 
-                // Add 30 minutes to the original time
-                const [hours, minutes] = appointment.time.split(':').map(Number);
-                const newHours = Math.floor((hours * 60 + minutes + 30) / 60) % 24;
-                const newMinutes = (minutes + 30) % 60;
-                state.bookingData.time = `${newHours.toString().padStart(2, '0')}:${newMinutes.toString().padStart(2, '0')}`;
+                    // Ir a la página de reserva
+                    showPage('bookAppointmentPage');
+                    state.currentBookingStep = 3; // Ir directamente a selección de fecha/hora
+                    updateBookingStep();
 
-                // Keep the same date
-                state.bookingData.date = appointment.date;
-
-                // Go to booking page
-                showPage('bookAppointmentPage');
-                state.currentBookingStep = 3; // Skip to date/time selection
-                updateBookingStep();
-
-                showToast('Please select a new date and time', 'info');
+                    showToast('Por favor selecciona una nueva fecha y hora', 'info');
+                }
             }
         }
+    } catch (error) {
+        console.error("Error al reprogramar cita:", error);
+        showToast('Error al reprogramar cita', 'error');
     }
 }
-
 // Profile
 async function renderProfile() {
     if (!state.currentUser) return;

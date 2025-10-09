@@ -50,13 +50,16 @@ export function generateTimeSlots() {
     return slots;
 }
 
-export function isTimeSlotAvailable(dateStr, time, barberId, existingAppointments = []) {
+export function isTimeSlotAvailable(dateStr, time, barberId, existingAppointments = [], ignoreAppointmentId = null) {
     if (!dateStr || !time || !barberId) return false;
 
     // Check if there's an appointment at the same time with the same barber
     const conflictingAppointment = existingAppointments.find(a => {
+        // Ignorar la cita original si estamos reprogramando
+        if (ignoreAppointmentId && a.id === ignoreAppointmentId) return false;
+
         if (a.date !== dateStr || a.employee_id !== barberId) return false;
-        if (a.status === 'canceled') return false;
+        if (a.status === 'canceled' || a.status === 'rescheduling') return false;
 
         // Parse times
         const [existingHour, existingMinute] = a.time.split(':').map(Number);

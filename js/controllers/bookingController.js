@@ -2,55 +2,62 @@
 import { DatabaseService } from '../services/databaseService.js';
 import { translations } from '../services/translation.js';
 import { generateId } from '../utils/constants.js';
-import { 
-    formatDate, 
-    formatDateDisplay, 
-    formatDays, 
-    isToday, 
-    isPast, 
-    generateTimeSlots, 
-    isTimeSlotAvailable 
+import {
+    formatDate,
+    formatDateDisplay,
+    formatDays,
+    isToday,
+    isPast,
+    generateTimeSlots,
+    isTimeSlotAvailable
 } from '../utils/dateUtils.js';
 import { showToast, showLoading } from '../utils/uiUtils.js';
 
 export class BookingController {
-    static setupEventListeners(state, elements, { updateBookingStep, resetBookingData, showPage, renderAppointments }) {
-        console.log('Setting up booking controller event listeners...');
 
-        // Booking navigation
-        if (elements.prevStep) {
-            elements.prevStep.addEventListener('click', () => {
-                if (state.currentBookingStep > 1) {
-                    state.currentBookingStep--;
-                    updateBookingStep();
-                }
-            });
-        }
+static setupEventListeners(state, elements, { updateBookingStep, resetBookingData, showPage, renderAppointments }) {
+    console.log('Setting up booking controller event listeners...');
 
-        if (elements.nextStep) {
-            elements.nextStep.addEventListener('click', () => {
-                // CORRECCIÓN: Si estamos en el paso 4 y ya hemos reservado, ir a citas
-                if (state.currentBookingStep === 4 && elements.bookAnother && elements.bookAnother.style.display !== 'none') {
-                    showPage('myAppointmentsPage');
-                    renderAppointments();
-                }
-                // Si no, comportamiento normal del botón Next
-                else if (state.currentBookingStep < 4 && BookingController.validateCurrentStep(state)) {
-                    state.currentBookingStep++;
-                    updateBookingStep();
-                }
-            });
-        }
-
-        if (elements.confirmBooking) {
-            elements.confirmBooking.addEventListener('click', () => BookingController.confirmBooking(state));
-        }
-
-        if (elements.bookAnother) {
-            elements.bookAnother.addEventListener('click', () => BookingController.bookAnotherAppointment(state, { resetBookingData, updateBookingStep }));
-        }
+    // Booking navigation
+    if (elements.prevStep) {
+        elements.prevStep.addEventListener('click', () => {
+            if (state.currentBookingStep > 1) {
+                state.currentBookingStep--;
+                updateBookingStep();
+            }
+        });
     }
 
+    if (elements.nextStep) {
+        elements.nextStep.addEventListener('click', () => {
+            // CORRECCIÓN: Si estamos en el paso 4 y ya hemos reservado, ir a citas
+            if (state.currentBookingStep === 4 && elements.bookAnother && elements.bookAnother.style.display !== 'none') {
+                showPage('myAppointmentsPage');
+                renderAppointments();
+            }
+            // MODIFICACIÓN: Si el texto del botón es "Ver Mis Citas", ir a la página de citas
+            else if (state.currentBookingStep === 4 && elements.nextStep.textContent === 'Ver Mis Citas') {
+                showPage('myAppointmentsPage');
+                renderAppointments();
+            }
+            // Si no, comportamiento normal del botón Next
+            else if (state.currentBookingStep < 4 && BookingController.validateCurrentStep(state)) {
+                state.currentBookingStep++;
+                updateBookingStep();
+            }
+        });
+    }
+
+    if (elements.confirmBooking) {
+        elements.confirmBooking.addEventListener('click', () => BookingController.confirmBooking(state));
+    }
+
+    if (elements.bookAnother) {
+        elements.bookAnother.addEventListener('click', () => BookingController.bookAnotherAppointment(state, { resetBookingData, updateBookingStep }));
+    }
+}
+
+// ... (rest of the code)
     static async renderServiceSelection(state, elements) {
         showLoading(true);
 
@@ -250,15 +257,14 @@ export class BookingController {
 
         if (!state.bookingData.date) {
             container.innerHTML = `
-                <div class="time-slots-message">
-                    ${translations[state.currentLanguage]['pleaseSelectDate'] || 'Please select a date first'}
-                </div>
-            `;
+            <div class="time-slots-message">
+                ${translations[state.currentLanguage]['pleaseSelectDate'] || 'Please select a date first'}
+            </div>
+        `;
             return;
         }
 
         const timeSlots = generateTimeSlots();
-
         container.innerHTML = '';
 
         // Obtener citas existentes para verificar disponibilidad
@@ -274,8 +280,16 @@ export class BookingController {
             slot.className = 'time-slot';
             slot.textContent = time;
 
-            // Check if time slot is available
-            if (isTimeSlotAvailable(state.bookingData.date, time, state.bookingData.barber?.id, existingAppointments)) {
+            // Verificar si el horario está disponible
+            const isAvailable = isTimeSlotAvailable(
+                state.bookingData.date,
+                time,
+                state.bookingData.barber?.id,
+                existingAppointments,
+                state.bookingData.originalAppointmentId // Pasar ID de cita original para ignorarla
+            );
+
+            if (isAvailable) {
                 if (state.bookingData.time === time) {
                     slot.classList.add('selected');
                 }
@@ -286,6 +300,7 @@ export class BookingController {
                 });
             } else {
                 slot.classList.add('disabled');
+                slot.title = 'Este horario ya está ocupado';
             }
 
             container.appendChild(slot);
@@ -350,10 +365,88 @@ export class BookingController {
         }
     }
 
-    static async confirmBooking(state) {
-        if (!BookingController.validateCurrentStep(state)) return;
 
-        try {
+
+static async confirmBooking(state) {
+    if (!BookingController.validateCurrentStep(state)) return;
+
+    try {
+        // Verificar si el horario está disponible ANTES de confirmar
+        const appointmentsResult = await DatabaseService.getAppointments({
+            dateFrom: state.bookingData.date,
+            dateTo: state.bookingData.date
+        });
+
+        if (appointmentsResult.success) {
+            const existingAppointments = appointmentsResult.data;
+
+            // Verificar si hay conflicto con otra cita
+            const hasConflict = existingAppointments.some(a => {
+                if (a.id === state.bookingData.originalAppointmentId) return false; // Ignorar la cita original
+
+                if (a.date !== state.bookingData.date || a.employee_id !== state.bookingData.barber.id) return false;
+                if (a.status === 'canceled' || a.status === 'rescheduling') return false;
+
+                // Parsear tiempos
+                const [existingHour, existingMinute] = a.time.split(':').map(Number);
+                const [newHour, newMinute] = state.bookingData.time.split(':').map(Number);
+
+                // Convertir a minutos
+                const existingStart = existingHour * 60 + existingMinute;
+                const existingEnd = existingStart + (a.duration || 30);
+                const newStart = newHour * 60 + newMinute;
+                const newEnd = newStart + (state.bookingData.service?.duration || 30);
+
+                // Verificar si hay solapamiento
+                return (newStart < existingEnd && newEnd > existingStart);
+            });
+
+            if (hasConflict) {
+                showToast('Este horario ya está ocupado. Por favor selecciona otro.', 'error');
+                return;
+            }
+        }
+
+        // Si estamos reprogramando una cita existente
+        if (state.bookingData.originalAppointmentId) {
+            // Actualizar la cita original con los nuevos datos
+            const updateResult = await DatabaseService.updateAppointment(
+                state.bookingData.originalAppointmentId,
+                {
+                    date: state.bookingData.date,
+                    time: state.bookingData.time,
+                    employee_id: state.bookingData.barber.id,
+                    service_id: state.bookingData.service.id,
+                    status: 'pending' // Volver a estado pendiente para confirmación
+                }
+            );
+
+            if (updateResult.success) {
+                showToast('Cita reprogramada con éxito', 'success');
+
+                // Limpiar datos de reserva
+                state.bookingData.originalAppointmentId = null;
+
+                // CORRECCIÓN: Configurar botones después de reprogramar
+                const confirmBooking = document.getElementById('confirmBooking');
+                const bookAnother = document.getElementById('bookAnother');
+                const nextStep = document.getElementById('nextStep');
+
+                if (confirmBooking) {
+                    confirmBooking.style.display = 'none';
+                }
+                if (bookAnother) {
+                    bookAnother.style.display = 'none';
+                }
+                if (nextStep) {
+                    nextStep.disabled = false; // Asegurar que el botón esté habilitado
+                    nextStep.textContent = 'Ver Mis Citas';
+                }
+            } else {
+                showToast('Error al reprogramar cita', 'error');
+            }
+        } else {
+            // Si es una nueva cita
             const newAppointment = {
                 id: generateId(),
                 client_id: state.currentUser.id,
@@ -382,19 +475,18 @@ export class BookingController {
                 if (bookAnother) {
                     bookAnother.style.display = 'block';
                 }
-
-                // CORRECCIÓN: Habilitar el botón Next para que pueda redirigir a citas
                 if (nextStep) {
-                    nextStep.disabled = false;
+                    nextStep.disabled = false; // Asegurar que el botón esté habilitado
                 }
             } else {
                 showToast('Error booking appointment', 'error');
             }
-        } catch (error) {
-            console.error("Error booking appointment:", error);
-            showToast('Error booking appointment', 'error');
         }
+    } catch (error) {
+        console.error("Error booking appointment:", error);
+        showToast('Error booking appointment', 'error');
     }
+}
 
     static bookAnotherAppointment(state, { resetBookingData, updateBookingStep }) {
         // Reset booking data and start over
