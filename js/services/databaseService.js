@@ -24,7 +24,7 @@ export class DatabaseService {
         if (!localStorage.getItem('services')) {
             // Obtener idioma actual o usar inglés como predeterminado
             const currentLanguage = localStorage.getItem('language') || 'en';
-            
+
             const defaultServices = [
                 {
                     id: 'service-1',
@@ -33,7 +33,7 @@ export class DatabaseService {
                     nameEs: 'Corte de Pelo Clásico',
                     duration: 30,
                     price: 25,
-                    desc: currentLanguage === 'es' 
+                    desc: currentLanguage === 'es'
                         ? 'Un corte de pelo clásico con tijeras y maquinilla, perfecto para mantener tu estilo.'
                         : 'A classic haircut with scissors and clippers, perfect for maintaining your style.',
                     descEn: 'A classic haircut with scissors and clippers, perfect for maintaining your style.',
@@ -92,7 +92,7 @@ export class DatabaseService {
 
         if (!localStorage.getItem('barbers')) {
             const currentLanguage = localStorage.getItem('language') || 'en';
-            
+
             const defaultBarbers = [
                 {
                     id: 'barber-1',
@@ -137,83 +137,32 @@ export class DatabaseService {
     }
 
     // Nuevo método para actualizar servicios cuando cambia el idioma
+    // Reemplaza el método updateServicesLanguage con esta versión mejorada
     static updateServicesLanguage(language) {
         const services = JSON.parse(localStorage.getItem('services')) || [];
-        
-        const translatedServices = [
-            {
-                id: 'service-1',
-                name: language === 'es' ? 'Corte de Pelo Clásico' : 'Classic Haircut',
-                nameEn: 'Classic Haircut',
-                nameEs: 'Corte de Pelo Clásico',
-                duration: 30,
-                price: 25,
-                desc: language === 'es' 
-                    ? 'Un corte de pelo clásico con tijeras y maquinilla, perfecto para mantener tu estilo.'
-                    : 'A classic haircut with scissors and clippers, perfect for maintaining your style.',
-                descEn: 'A classic haircut with scissors and clippers, perfect for maintaining your style.',
-                descEs: 'Un corte de pelo clásico con tijeras y maquinilla, perfecto para mantener tu estilo.',
-                img: 'images/Fade.jpg',
-                active: true
-            },
-            {
-                id: 'service-2',
-                name: language === 'es' ? 'Recorte de Barba' : 'Beard Trim',
-                nameEn: 'Beard Trim',
-                nameEs: 'Recorte de Barba',
-                duration: 20,
-                price: 15,
-                desc: language === 'es'
-                    ? 'Recorte y perfilado profesional de barba para mantenerte impecable.'
-                    : 'Professional beard trimming and shaping to keep you looking sharp.',
-                descEn: 'Professional beard trimming and shaping to keep you looking sharp.',
-                descEs: 'Recorte y perfilado profesional de barba para mantenerte impecable.',
-                img: 'images/BeardTrim.png',
-                active: true
-            },
-            {
-                id: 'service-3',
-                name: language === 'es' ? 'Afeitado con Toalla Caliente' : 'Hot Towel Shave',
-                nameEn: 'Hot Towel Shave',
-                nameEs: 'Afeitado con Toalla Caliente',
-                duration: 45,
-                price: 35,
-                desc: language === 'es'
-                    ? 'Relajante afeitado con toalla caliente y productos premium para el afeitado más cercano.'
-                    : 'Relaxing hot towel shave with premium products for the closest shave.',
-                descEn: 'Relaxing hot towel shave with premium products for the closest shave.',
-                descEs: 'Relajante afeitado con toalla caliente y productos premium para el afeitado más cercano.',
-                img: 'images/HotTowelService.jpg',
-                active: true
-            },
-            {
-                id: 'service-4',
-                name: language === 'es' ? 'Corte y Barba' : 'Haircut & Beard',
-                nameEn: 'Haircut & Beard',
-                nameEs: 'Corte y Barba',
-                duration: 50,
-                price: 40,
-                desc: language === 'es'
-                    ? 'Paquete de cuidado completo con corte de pelo y recorte de barba.'
-                    : 'Complete grooming package with haircut and beard trim.',
-                descEn: 'Complete grooming package with haircut and beard trim.',
-                descEs: 'Paquete de cuidado completo con corte de pelo y recorte de barba.',
-                img: 'images/Haircut.jpg',
-                active: true
-            }
-        ];
 
-        // Actualizar solo los servicios predeterminados, mantener los servicios personalizados
+        // Actualizar todos los servicios, no solo los predeterminados
         const updatedServices = services.map(service => {
-            const translatedService = translatedServices.find(ts => ts.id === service.id);
-            if (translatedService) {
+            // Si el servicio ya tiene campos de traducción, solo actualizamos el campo visible
+            if (service.nameEn && service.nameEs) {
                 return {
                     ...service,
-                    name: translatedService.name,
-                    desc: translatedService.desc
+                    name: language === 'es' ? service.nameEs : service.nameEn,
+                    desc: language === 'es' ? service.descEs : service.descEn
                 };
             }
-            return service;
+            // Si no tiene campos de traducción, los creamos
+            else {
+                return {
+                    ...service,
+                    nameEn: service.nameEn || service.name,
+                    nameEs: service.nameEs || service.name,
+                    descEn: service.descEn || service.desc,
+                    descEs: service.descEs || service.desc,
+                    name: language === 'es' ? (service.nameEs || service.name) : (service.nameEn || service.name),
+                    desc: language === 'es' ? (service.descEs || service.desc) : (service.descEn || service.desc)
+                };
+            }
         });
 
         localStorage.setItem('services', JSON.stringify(updatedServices));
@@ -222,7 +171,7 @@ export class DatabaseService {
     // Nuevo método para actualizar barberos cuando cambia el idioma
     static updateBarbersLanguage(language) {
         const barbers = JSON.parse(localStorage.getItem('barbers')) || [];
-        
+
         const translatedBarbers = [
             {
                 id: 'barber-1',

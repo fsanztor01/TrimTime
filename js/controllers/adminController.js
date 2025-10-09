@@ -347,11 +347,11 @@ export class AdminController {
                 <h2>${translations[state.currentLanguage]['calendar.selectDate'] || 'Appointments for'} ${formatDateDisplay(dateStr)}</h2>
                 <div class="appointments-list">
                     ${appointments.map(appointment => {
-                        const service = services.find(s => s.id === appointment.service_id);
-                        const barber = barbers.find(b => b.id === appointment.employee_id);
-                        const client = users.find(u => u.id === appointment.client_id);
+                const service = services.find(s => s.id === appointment.service_id);
+                const barber = barbers.find(b => b.id === appointment.employee_id);
+                const client = users.find(u => u.id === appointment.client_id);
 
-                        const trashBtn = `
+                const trashBtn = `
                             <button
                                 class="btn"
                                 title="${translations[state.currentLanguage]['admin.delete'] || 'Delete'}"
@@ -360,7 +360,7 @@ export class AdminController {
                                 aria-label="Delete appointment"
                             >🗑️</button>`;
 
-                        return `
+                return `
                             <div class="appointment-card" data-appointment-id="${appointment.id}">
                                 <div class="appointment-header" style="display:flex;align-items:center;gap:.5rem;justify-content:space-between;">
                                     <h3 style="margin-right:auto">${service?.name || 'Service'}</h3>
@@ -378,15 +378,15 @@ export class AdminController {
                                 </div>
                                 <div class="appointment-actions">
                                     ${appointment.status === 'pending'
-                                        ? `<button class="btn btn-primary" onclick="updateAppointmentStatus('${appointment.id}', 'confirmed')">${translations[state.currentLanguage]['admin.confirm'] || 'Confirm'}</button>` : ''}
+                        ? `<button class="btn btn-primary" onclick="updateAppointmentStatus('${appointment.id}', 'confirmed')">${translations[state.currentLanguage]['admin.confirm'] || 'Confirm'}</button>` : ''}
                                     ${appointment.status === 'confirmed'
-                                        ? `<button class="btn btn-primary" onclick="updateAppointmentStatus('${appointment.id}', 'completed')">${translations[state.currentLanguage]['admin.complete'] || 'Complete'}</button>` : ''}
+                        ? `<button class="btn btn-primary" onclick="updateAppointmentStatus('${appointment.id}', 'completed')">${translations[state.currentLanguage]['admin.complete'] || 'Complete'}</button>` : ''}
                                     ${(appointment.status !== 'canceled' && appointment.status !== 'completed')
-                                        ? `<button class="btn btn-danger" onclick="updateAppointmentStatus('${appointment.id}', 'canceled')">${translations[state.currentLanguage]['admin.cancel'] || 'Cancel'}</button>` : ''}
+                        ? `<button class="btn btn-danger" onclick="updateAppointmentStatus('${appointment.id}', 'canceled')">${translations[state.currentLanguage]['admin.cancel'] || 'Cancel'}</button>` : ''}
                                 </div>
                             </div>
                         `;
-                    }).join('')}
+            }).join('')}
                 </div>
             `;
 
@@ -464,11 +464,11 @@ export class AdminController {
                         </div>
                         <div class="admin-card-actions">
                             ${appointment.status === 'pending'
-                                ? `<button class="btn btn-primary" onclick="updateAppointmentStatus('${appointment.id}', 'confirmed')">${translations[state.currentLanguage]['admin.confirm'] || 'Confirm'}</button>` : ''}
+                            ? `<button class="btn btn-primary" onclick="updateAppointmentStatus('${appointment.id}', 'confirmed')">${translations[state.currentLanguage]['admin.confirm'] || 'Confirm'}</button>` : ''}
                             ${appointment.status === 'confirmed'
-                                ? `<button class="btn btn-primary" onclick="updateAppointmentStatus('${appointment.id}', 'completed')">${translations[state.currentLanguage]['admin.complete'] || 'Complete'}</button>` : ''}
+                            ? `<button class="btn btn-primary" onclick="updateAppointmentStatus('${appointment.id}', 'completed')">${translations[state.currentLanguage]['admin.complete'] || 'Complete'}</button>` : ''}
                             ${(appointment.status !== 'canceled' && appointment.status !== 'completed')
-                                ? `<button class="btn btn-danger" onclick="updateAppointmentStatus('${appointment.id}', 'canceled')">${translations[state.currentLanguage]['admin.cancel'] || 'Cancel'}</button>` : ''}
+                            ? `<button class="btn btn-danger" onclick="updateAppointmentStatus('${appointment.id}', 'canceled')">${translations[state.currentLanguage]['admin.cancel'] || 'Cancel'}</button>` : ''}
                         </div>
                     `;
 
@@ -484,7 +484,7 @@ export class AdminController {
             showLoading(false);
         }
     }
-        // =============== SERVICIOS (LISTADO) ===============
+    // =============== SERVICIOS (LISTADO) ===============
     static async renderAdminServices(state, elements) {
         showLoading(true);
 
@@ -505,12 +505,13 @@ export class AdminController {
                 }
 
                 services.forEach(service => {
-                    const name = state.currentLanguage === 'es'
-                        ? (service.nameEs || service.name)
-                        : (service.nameEn || service.name);
-                    const desc = state.currentLanguage === 'es'
-                        ? (service.descEs || service.desc)
-                        : (service.descEn || service.desc);
+                    // Código corregido
+                    const name = service.nameEs && service.nameEn
+                        ? (state.currentLanguage === 'es' ? service.nameEs : service.nameEn)
+                        : service.name;
+                    const desc = service.descEs && service.descEn
+                        ? (state.currentLanguage === 'es' ? service.descEs : service.descEn)
+                        : service.desc;
 
                     const card = document.createElement('div');
                     card.className = 'admin-card';
@@ -519,8 +520,8 @@ export class AdminController {
                             <h3>${name}</h3>
                             <span class="appointment-status ${service.active ? 'status-confirmed' : 'status-canceled'}">
                                 ${service.active
-                                    ? translations[state.currentLanguage]['admin.active'] || 'Active'
-                                    : translations[state.currentLanguage]['admin.inactive'] || 'Inactive'}
+                            ? translations[state.currentLanguage]['admin.active'] || 'Active'
+                            : translations[state.currentLanguage]['admin.inactive'] || 'Inactive'}
                             </span>
                         </div>
                         <div class="appointment-details">
@@ -534,8 +535,8 @@ export class AdminController {
                             </button>
                             <button class="btn btn-secondary" onclick="toggleServiceStatus('${service.id}')">
                                 ${service.active
-                                    ? translations[state.currentLanguage]['admin.deactivate'] || 'Deactivate'
-                                    : translations[state.currentLanguage]['admin.activate'] || 'Activate'}
+                            ? translations[state.currentLanguage]['admin.deactivate'] || 'Deactivate'
+                            : translations[state.currentLanguage]['admin.activate'] || 'Activate'}
                             </button>
                             <button class="btn" title="${translations[state.currentLanguage]['admin.delete'] || 'Delete'}"
                                 onclick="deleteService('${service.id}')"
@@ -559,88 +560,92 @@ export class AdminController {
     }
 
     // =============== SERVICIOS (MODAL NUEVO) ===============
-    static showAddServiceModal(state, elements) {
-        const modal = document.getElementById('serviceModal');
-        const content = document.getElementById('serviceModalContent');
+    // =============== SERVICIOS (MODAL NUEVO) ===============
+static showAddServiceModal(state, elements) {
+    const modal = document.getElementById('serviceModal');
+    const content = document.getElementById('serviceModalContent');
 
-        if (!modal || !content) return;
+    if (!modal || !content) return;
 
-        content.innerHTML = `
-            <h2>Add New Service</h2>
-            <form id="addServiceForm">
-                <div class="form-group">
-                    <label for="serviceNameEn">Service Name (EN)</label>
-                    <input type="text" id="serviceNameEn" required>
-                </div>
-                <div class="form-group">
-                    <label for="serviceNameEs">Nombre del Servicio (ES)</label>
-                    <input type="text" id="serviceNameEs" required>
-                </div>
-                <div class="form-group">
-                    <label for="serviceDuration">Duration (minutes)</label>
-                    <input type="number" id="serviceDuration" min="5" step="5" required>
-                </div>
-                <div class="form-group">
-                    <label for="servicePrice">Price ($)</label>
-                    <input type="number" id="servicePrice" min="0" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label for="serviceDescEn">Description (EN)</label>
-                    <textarea id="serviceDescEn" rows="3" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="serviceDescEs">Descripción (ES)</label>
-                    <textarea id="serviceDescEs" rows="3" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="serviceActive" checked>
-                        <span>Active</span>
-                    </label>
-                </div>
-                <button type="submit" class="btn btn-primary">Add Service</button>
-            </form>
-        `;
+    content.innerHTML = `
+        <h2>Add New Service</h2>
+        <form id="addServiceForm">
+            <div class="form-group">
+                <label for="serviceNameEn">Service Name (EN)</label>
+                <input type="text" id="serviceNameEn" required>
+            </div>
+            <div class="form-group">
+                <label for="serviceNameEs">Nombre del Servicio (ES)</label>
+                <input type="text" id="serviceNameEs" required>
+            </div>
+            <div class="form-group">
+                <label for="serviceDuration">Duration (minutes)</label>
+                <input type="number" id="serviceDuration" min="5" step="5" required>
+            </div>
+            <div class="form-group">
+                <label for="servicePrice">Price ($)</label>
+                <input type="number" id="servicePrice" min="0" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="serviceDescEn">Description (EN)</label>
+                <textarea id="serviceDescEn" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="serviceDescEs">Descripción (ES)</label>
+                <textarea id="serviceDescEs" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="serviceActive" checked>
+                    <span>Active</span>
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Service</button>
+        </form>
+    `;
 
-        modal.classList.add('active');
+    modal.classList.add('active');
 
-        document.getElementById('addServiceForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+    // 🔥 PARTE IMPORTANTE: AÑADE ESTE EVENT LISTENER
+    document.getElementById('addServiceForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-            const idForImg = generateId();
-            const newService = {
-                id: generateId(),
-                nameEn: document.getElementById('serviceNameEn').value.trim(),
-                nameEs: document.getElementById('serviceNameEs').value.trim(),
-                name: state.currentLanguage === 'es'
-                    ? document.getElementById('serviceNameEs').value.trim()
-                    : document.getElementById('serviceNameEn').value.trim(),
-                duration: parseInt(document.getElementById('serviceDuration').value, 10),
-                price: parseFloat(document.getElementById('servicePrice').value),
-                descEn: document.getElementById('serviceDescEn').value.trim(),
-                descEs: document.getElementById('serviceDescEs').value.trim(),
-                desc: state.currentLanguage === 'es'
-                    ? document.getElementById('serviceDescEs').value.trim()
-                    : document.getElementById('serviceDescEn').value.trim(),
-                img: `https://picsum.photos/seed/${idForImg}/300/200.jpg`,
-                active: document.getElementById('serviceActive').checked
-            };
+        const idForImg = generateId();
+        
+        // 🔥 AQUÍ SE GUARDAN TODOS LOS CAMPOS DE TRADUCCIÓN
+        const newService = {
+            id: generateId(),
+            nameEn: document.getElementById('serviceNameEn').value.trim(),
+            nameEs: document.getElementById('serviceNameEs').value.trim(),
+            name: state.currentLanguage === 'es' 
+                ? document.getElementById('serviceNameEs').value.trim()
+                : document.getElementById('serviceNameEn').value.trim(),
+            duration: parseInt(document.getElementById('serviceDuration').value, 10),
+            price: parseFloat(document.getElementById('servicePrice').value),
+            descEn: document.getElementById('serviceDescEn').value.trim(),
+            descEs: document.getElementById('serviceDescEs').value.trim(),
+            desc: state.currentLanguage === 'es'
+                ? document.getElementById('serviceDescEs').value.trim()
+                : document.getElementById('serviceDescEn').value.trim(),
+            img: `https://picsum.photos/seed/${idForImg}/300/200.jpg`,
+            active: document.getElementById('serviceActive').checked
+        };
 
-            try {
-                const result = await DatabaseService.saveService(newService);
-                if (result.success) {
-                    showToast(translations[state.currentLanguage]['serviceAdded'] || 'Service added successfully', 'success');
-                    modal.classList.remove('active');
-                    AdminController.renderAdminServices(state, elements);
-                } else {
-                    showToast('Error adding service', 'error');
-                }
-            } catch (error) {
-                console.error("Error adding service:", error);
+        try {
+            const result = await DatabaseService.saveService(newService);
+            if (result.success) {
+                showToast(translations[state.currentLanguage]['serviceAdded'] || 'Service added successfully', 'success');
+                modal.classList.remove('active');
+                AdminController.renderAdminServices(state, elements);
+            } else {
                 showToast('Error adding service', 'error');
             }
-        });
-    }
+        } catch (error) {
+            console.error("Error adding service:", error);
+            showToast('Error adding service', 'error');
+        }
+    });
+}
 
     // =============== SERVICIOS (MODAL EDITAR) ===============
     static async showEditServiceModal(state, elements, serviceId) {
@@ -738,7 +743,7 @@ export class AdminController {
             showToast('Error opening edit modal', 'error');
         }
     }
-        // =============== BARBEROS (LISTADO) ===============
+    // =============== BARBEROS (LISTADO) ===============
     static async renderAdminBarbers(state, elements) {
         showLoading(true);
 
@@ -766,8 +771,8 @@ export class AdminController {
                             <h3>${barber.name}</h3>
                             <span class="appointment-status ${barber.active ? 'status-confirmed' : 'status-canceled'}">
                                 ${barber.active
-                                    ? translations[state.currentLanguage]['admin.active'] || 'Active'
-                                    : translations[state.currentLanguage]['admin.inactive'] || 'Inactive'}
+                            ? translations[state.currentLanguage]['admin.active'] || 'Active'
+                            : translations[state.currentLanguage]['admin.inactive'] || 'Inactive'}
                             </span>
                         </div>
                         <div class="appointment-details">
@@ -781,8 +786,8 @@ export class AdminController {
                             </button>
                             <button class="btn btn-secondary" onclick="toggleBarberStatus('${barber.id}')">
                                 ${barber.active
-                                    ? translations[state.currentLanguage]['admin.deactivate'] || 'Deactivate'
-                                    : translations[state.currentLanguage]['admin.activate'] || 'Activate'}
+                            ? translations[state.currentLanguage]['admin.deactivate'] || 'Deactivate'
+                            : translations[state.currentLanguage]['admin.activate'] || 'Activate'}
                             </button>
                         </div>
                     `;

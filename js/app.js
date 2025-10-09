@@ -2,19 +2,19 @@
 import { DatabaseService } from './services/databaseService.js';
 import { translations } from './services/translation.js';
 import { generateId } from './utils/constants.js';
-import { 
-    formatDate, 
-    formatDateDisplay, 
-    formatDays, 
-    isToday, 
-    isPast, 
-    generateTimeSlots, 
-    isTimeSlotAvailable, 
-    getStatusColor 
+import {
+    formatDate,
+    formatDateDisplay,
+    formatDays,
+    isToday,
+    isPast,
+    generateTimeSlots,
+    isTimeSlotAvailable,
+    getStatusColor
 } from './utils/dateUtils.js';
-import { 
-    showToast, 
-    showLoading 
+import {
+    showToast,
+    showLoading
 } from './utils/uiUtils.js';
 import { AuthController } from './controllers/authController.js';
 import { BookingController } from './controllers/bookingController.js';
@@ -105,7 +105,7 @@ async function initializeApp() {
     } else {
         showPage('loginPage');
         elements.bottomNav.classList.add('hidden');
-        
+
         // Hide admin button when no user is logged in
         const adminBtn = document.getElementById('adminNavBtn');
         if (adminBtn) {
@@ -131,13 +131,13 @@ function setupEventListeners() {
     if (elements.langToggle) {
         elements.langToggle.addEventListener('click', toggleLanguage);
 
-            // Admin button (engranaje en header)
-    const adminBtn = document.getElementById('adminNavBtn');
-    if (adminBtn) {
-        adminBtn.addEventListener('click', () => {
-            showPage('adminDashboardPage');
-        });
-    }
+        // Admin button (engranaje en header)
+        const adminBtn = document.getElementById('adminNavBtn');
+        if (adminBtn) {
+            adminBtn.addEventListener('click', () => {
+                showPage('adminDashboardPage');
+            });
+        }
 
     }
 
@@ -272,7 +272,7 @@ function showPage(pageId) {
         renderHomePage();
         renderBarbers();
     }
-    
+
     // Ensure admin button visibility is updated
     const adminBtn = document.getElementById('adminNavBtn');
     if (adminBtn) {
@@ -317,7 +317,7 @@ function updateNavigation() {
         });
     } else {
         elements.bottomNav.classList.add('hidden');
-        
+
         // Hide admin button when no user is logged in
         const adminBtn = document.getElementById('adminNavBtn');
         if (adminBtn) {
@@ -501,19 +501,27 @@ async function renderServices() {
 
             if (result.success) {
                 result.data.forEach(service => {
+                    // Obtener el nombre y descripción según el idioma
+                    const name = service.nameEs && service.nameEn
+                        ? (state.currentLanguage === 'es' ? service.nameEs : service.nameEn)
+                        : service.name;
+                    const desc = service.descEs && service.descEn
+                        ? (state.currentLanguage === 'es' ? service.descEs : service.descEn)
+                        : service.desc;
+
                     const serviceCard = document.createElement('div');
                     serviceCard.className = 'service-card';
                     serviceCard.innerHTML = `
-                        <img src="${service.img}" alt="${service.name}">
-                        <div class="service-card-content">
-                            <h3>${service.name}</h3>
-                            <p>${service.desc}</p>
-                            <div class="service-meta">
-                                <span>⏱️ ${service.duration} ${translations[state.currentLanguage]['booking.duration'] || 'min'}</span>
-                                <span>$${service.price}</span>
-                            </div>
-                        </div>
-                    `;
+        <img src="${service.img}" alt="${name}">
+        <div class="service-card-content">
+            <h3>${name}</h3>
+            <p>${desc}</p>
+            <div class="service-meta">
+                <span>⏱️ ${service.duration} ${translations[state.currentLanguage]['booking.duration'] || 'min'}</span>
+                <span>$${service.price}</span>
+            </div>
+        </div>
+    `;
 
                     serviceCard.addEventListener('click', () => {
                         showServiceDetails(service);
@@ -929,7 +937,7 @@ function logout() {
 // CORRECCIÓN: Añadir funciones globales para los eventos onclick en el HTML
 window.rescheduleAppointment = rescheduleAppointment;
 window.cancelAppointment = cancelAppointment;
-window.updateAppointmentStatus = async function(appointmentId, newStatus) {
+window.updateAppointmentStatus = async function (appointmentId, newStatus) {
     try {
         const result = await DatabaseService.updateAppointment(appointmentId, { status: newStatus });
 
@@ -959,11 +967,11 @@ window.updateAppointmentStatus = async function(appointmentId, newStatus) {
     }
 };
 
-window.editService = function(serviceId) {
+window.editService = function (serviceId) {
     showToast('Edit service functionality not implemented in this demo', 'warning');
 };
 
-window.toggleServiceStatus = async function(serviceId) {
+window.toggleServiceStatus = async function (serviceId) {
     try {
         const servicesResult = await DatabaseService.getServices();
 
@@ -988,7 +996,7 @@ window.toggleServiceStatus = async function(serviceId) {
     }
 };
 
-window.deleteService = async function(serviceId) {
+window.deleteService = async function (serviceId) {
     if (!confirm('Are you sure you want to delete this service?')) return;
 
     try {
@@ -1007,11 +1015,11 @@ window.deleteService = async function(serviceId) {
     }
 };
 
-window.editBarber = function(barberId) {
+window.editBarber = function (barberId) {
     showToast('Edit barber functionality not implemented in this demo', 'warning');
 };
 
-window.toggleBarberStatus = async function(barberId) {
+window.toggleBarberStatus = async function (barberId) {
     try {
         const barbersResult = await DatabaseService.getBarbers();
 
