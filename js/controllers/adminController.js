@@ -200,123 +200,177 @@ export class AdminController {
         const container = document.getElementById('adminCalendar');
         if (!container) return;
 
-        const today = new Date();
-        const currentMonth = today.getMonth();
-        const currentYear = today.getFullYear();
+        // Mes y año actuales
+        const month = (typeof state.currentMonth === 'number') ? state.currentMonth : new Date().getMonth();
+        const year = (typeof state.currentYear === 'number') ? state.currentYear : new Date().getFullYear();
+
+        // Cabecera
+        const monthsStr = translations[state.currentLanguage]?.['calendar.months']
+            || 'January,February,March,April,May,June,July,August,September,October,November,December';
+        const months = monthsStr.split(',');
+        const monthName = months[month] || '';
 
         const header = document.createElement('div');
         header.className = 'calendar-header';
-
-        const months = translations[state.currentLanguage]['calendar.months'].split(',');
-        const monthName = months[currentMonth];
-
         header.innerHTML = `
-            <h3>${monthName} ${currentYear}</h3>
-            <div class="calendar-nav">
-                <button class="btn btn-secondary" id="adminPrevMonth">${translations[state.currentLanguage]['booking.prev'] || 'Previous'}</button>
-                <button class="btn btn-secondary" id="adminNextMonth">${translations[state.currentLanguage]['booking.next'] || 'Next'}</button>
-            </div>
-        `;
+        <h3>${monthName} ${year}</h3>
+        <div class="calendar-nav">
+            <button class="btn btn-secondary" id="adminPrevMonth">◀</button>
+            <button class="btn btn-secondary" id="adminNextMonth">▶</button>
+        </div>
+    `;
 
+        // Contenedor base
         container.innerHTML = '';
         container.appendChild(header);
 
         const grid = document.createElement('div');
         grid.className = 'calendar-grid';
+        container.appendChild(grid);
 
-        // Cabeceras de días
-        const dayHeaders = translations[state.currentLanguage]['calendar.days'].split(',');
+        // Cabecera de días
+        const daysStr = translations[state.currentLanguage]?.['calendar.days'] || 'Sun,Mon,Tue,Wed,Thu,Fri,Sat';
+        const dayHeaders = daysStr.split(',');
         dayHeaders.forEach(day => {
-            const dayHeader = document.createElement('div');
-            dayHeader.className = 'calendar-day-header';
-            dayHeader.textContent = day;
-            grid.appendChild(dayHeader);
+            const el = document.createElement('div');
+            el.className = 'calendar-day-header';
+            el.textContent = day;
+            grid.appendChild(el);
         });
 
-        // Cálculo de primer día y total de días
-        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-        for (let i = 0; i < firstDay; i++) {
-            grid.appendChild(document.createElement('div'));
-        }
+        // Espacios vacíos del primer día
+        for (let i = 0; i < firstDay; i++) grid.appendChild(document.createElement('div'));
 
         const isSameDate = (d1, d2) =>
             d1.getFullYear() === d2.getFullYear() &&
             d1.getMonth() === d2.getMonth() &&
             d1.getDate() === d2.getDate();
 
+        // Cargar citas
         DatabaseService.getAppointments().then(result => {
             if (!result.success) return;
             const appointments = result.data.filter(a => !a.deleted);
 
+            // Colores por estado
+            const COLORS = {
+                completed: '#0d6efd', // Azul
+                confirmed: '#28a745', // Verde
+                pending: '#ffc107',   // Amarillo
+                canceled: '#dc3545'   // Rojo
+            };
+
             for (let day = 1; day <= daysInMonth; day++) {
-                const dayElement = document.createElement('div');
-                dayElement.className = 'calendar-day';
-                dayElement.textContent = day;
+                const cell = document.createElement('div');
+                cell.className = 'calendar-day';
+                cell.style.display = 'flex';
+                cell.style.flexDirection = 'column';
+                cell.style.alignItems = 'center';
+                cell.style.justifyContent = 'flex-start';
+                cell.style.minHeight = '80px';
+                cell.style.padding = '6px 4px';
+                cell.style.textAlign = 'center';
 
-                const date = new Date(currentYear, currentMonth, day);
+                // Número del día
+                const numberEl = document.createElement('div');
+                numberEl.className = 'day-number';
+                numberEl.textContent = day;
+                numberEl.style.fontWeight = '700';
+                numberEl.style.fontSize = '16px';
+                numberEl.style.marginBottom = '6px';
+                cell.appendChild(numberEl);
+
+                // Contenedor de círculos
+                const indicators = document.createElement('div');
+                indicators.className = 'day-indicators';
+                indicators.style.display = 'flex';
+                indicators.style.gap = '4px';
+                indicators.style.flexWrap = 'wrap';
+                indicators.style.justifyContent = 'center';
+                indicators.style.alignItems = 'center';
+                cell.appendChild(indicators);
+
+                const date = new Date(year, month, day);
                 const dateStr = formatDate(date);
-                const dayOfWeek = date.getDay(); // 0 = Sunday
+                const dow = date.getDay();
 
+                // Hoy
                 if (isSameDate(date, new Date())) {
-                    dayElement.classList.add('today');
-                    dayElement.title = translations[state.currentLanguage]['calendar.today'] || 'Today';
+                    cell.classList.add('today');
+                    cell.title = 'Hoy';
                 }
 
-                if (dayOfWeek === 0) {
-                    dayElement.classList.add('disabled');
-                    dayElement.title = translations[state.currentLanguage]['calendar.sundayClosed'] || 'Sunday - Closed';
+                // Domingo cerrado
+                if (dow === 0) {
+                    cell.classList.add('disabled');
+                    cell.title = 'Domingo - Cerrado';
                 }
 
+                // Citas del día
                 const dayAppointments = appointments.filter(a => a.date === dateStr);
                 if (dayAppointments.length > 0) {
-                    dayElement.style.position = 'relative';
+                    // Contar por estado
+                    const counts = { completed: 0, confirmed: 0, pending: 0, canceled: 0 };
+                    dayAppointments.forEach(a => {
+                        if (counts[a.status] !== undefined) counts[a.status]++;
+                    });
 
-                    const STATUSES = ["canceled", "completed", "pending", "confirmed"];
-                    const COLORS = {
-                        canceled: "red",
-                        completed: "blue",
-                        pending: "yellow",
-                        confirmed: "green"
-                    };
-
-                    const statusesPresent = new Set(dayAppointments.map(a => a.status));
-                    let offset = 0;
-                    STATUSES.forEach(st => {
-                        if (statusesPresent.has(st) && offset < 4) {
-                            const dot = document.createElement('div');
-                            dot.style.position = 'absolute';
-                            dot.style.bottom = '5px';
-                            dot.style.left = `${5 + offset * 12}px`;
-                            dot.style.width = '8px';
-                            dot.style.height = '8px';
-                            dot.style.borderRadius = '50%';
-                            dot.style.backgroundColor = COLORS[st];
-                            dot.title = st;
-                            dayElement.appendChild(dot);
-                            offset++;
+                    // Crear hasta 4 círculos, uno por tipo
+                    Object.entries(counts).forEach(([status, count]) => {
+                        if (count > 0) {
+                            const badge = document.createElement('div');
+                            badge.className = 'status-circle';
+                            badge.style.minWidth = '20px';
+                            badge.style.height = '20px';
+                            badge.style.borderRadius = '50%';
+                            badge.style.display = 'flex';
+                            badge.style.alignItems = 'center';
+                            badge.style.justifyContent = 'center';
+                            badge.style.fontSize = '11px';
+                            badge.style.fontWeight = '700';
+                            badge.style.color = '#fff';
+                            badge.style.backgroundColor = COLORS[status];
+                            badge.textContent = count;
+                            indicators.appendChild(badge);
                         }
                     });
 
-                    dayElement.addEventListener('click', () => {
+                    // Click: mostrar citas del día
+                    cell.style.cursor = 'pointer';
+                    cell.addEventListener('click', () => {
                         AdminController.showDayAppointments(dateStr, state);
+                    });
+
+                    // Hover dorado
+                    cell.addEventListener('mouseenter', () => {
+                        cell.style.boxShadow = 'inset 0 0 0 2px rgba(212,175,55,0.25)';
+                    });
+                    cell.addEventListener('mouseleave', () => {
+                        cell.style.boxShadow = 'none';
                     });
                 }
 
-                grid.appendChild(dayElement);
+                grid.appendChild(cell);
             }
         });
 
-        container.appendChild(grid);
-
+        // Navegación
         document.getElementById('adminPrevMonth')?.addEventListener('click', () => {
-            showToast('Previous month navigation not implemented in this demo', 'warning');
+            state.currentMonth = (month === 0) ? 11 : month - 1;
+            state.currentYear = (month === 0) ? year - 1 : year;
+            AdminController.renderAdminCalendar(state, elements);
         });
+
         document.getElementById('adminNextMonth')?.addEventListener('click', () => {
-            showToast('Next month navigation not implemented in this demo', 'warning');
+            state.currentMonth = (month === 11) ? 0 : month + 1;
+            state.currentYear = (month === 11) ? year + 1 : year;
+            AdminController.renderAdminCalendar(state, elements);
         });
     }
+
+
 
     static async showDayAppointments(dateStr, state) {
         const appointmentsResult = await DatabaseService.getAppointments();
@@ -561,13 +615,13 @@ export class AdminController {
 
     // =============== SERVICIOS (MODAL NUEVO) ===============
     // =============== SERVICIOS (MODAL NUEVO) ===============
-static showAddServiceModal(state, elements) {
-    const modal = document.getElementById('serviceModal');
-    const content = document.getElementById('serviceModalContent');
+    static showAddServiceModal(state, elements) {
+        const modal = document.getElementById('serviceModal');
+        const content = document.getElementById('serviceModalContent');
 
-    if (!modal || !content) return;
+        if (!modal || !content) return;
 
-    content.innerHTML = `
+        content.innerHTML = `
         <h2>Add New Service</h2>
         <form id="addServiceForm">
             <div class="form-group">
@@ -604,48 +658,48 @@ static showAddServiceModal(state, elements) {
         </form>
     `;
 
-    modal.classList.add('active');
+        modal.classList.add('active');
 
-    // 🔥 PARTE IMPORTANTE: AÑADE ESTE EVENT LISTENER
-    document.getElementById('addServiceForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
+        // 🔥 PARTE IMPORTANTE: AÑADE ESTE EVENT LISTENER
+        document.getElementById('addServiceForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-        const idForImg = generateId();
-        
-        // 🔥 AQUÍ SE GUARDAN TODOS LOS CAMPOS DE TRADUCCIÓN
-        const newService = {
-            id: generateId(),
-            nameEn: document.getElementById('serviceNameEn').value.trim(),
-            nameEs: document.getElementById('serviceNameEs').value.trim(),
-            name: state.currentLanguage === 'es' 
-                ? document.getElementById('serviceNameEs').value.trim()
-                : document.getElementById('serviceNameEn').value.trim(),
-            duration: parseInt(document.getElementById('serviceDuration').value, 10),
-            price: parseFloat(document.getElementById('servicePrice').value),
-            descEn: document.getElementById('serviceDescEn').value.trim(),
-            descEs: document.getElementById('serviceDescEs').value.trim(),
-            desc: state.currentLanguage === 'es'
-                ? document.getElementById('serviceDescEs').value.trim()
-                : document.getElementById('serviceDescEn').value.trim(),
-            img: `https://picsum.photos/seed/${idForImg}/300/200.jpg`,
-            active: document.getElementById('serviceActive').checked
-        };
+            const idForImg = generateId();
 
-        try {
-            const result = await DatabaseService.saveService(newService);
-            if (result.success) {
-                showToast(translations[state.currentLanguage]['serviceAdded'] || 'Service added successfully', 'success');
-                modal.classList.remove('active');
-                AdminController.renderAdminServices(state, elements);
-            } else {
+            // 🔥 AQUÍ SE GUARDAN TODOS LOS CAMPOS DE TRADUCCIÓN
+            const newService = {
+                id: generateId(),
+                nameEn: document.getElementById('serviceNameEn').value.trim(),
+                nameEs: document.getElementById('serviceNameEs').value.trim(),
+                name: state.currentLanguage === 'es'
+                    ? document.getElementById('serviceNameEs').value.trim()
+                    : document.getElementById('serviceNameEn').value.trim(),
+                duration: parseInt(document.getElementById('serviceDuration').value, 10),
+                price: parseFloat(document.getElementById('servicePrice').value),
+                descEn: document.getElementById('serviceDescEn').value.trim(),
+                descEs: document.getElementById('serviceDescEs').value.trim(),
+                desc: state.currentLanguage === 'es'
+                    ? document.getElementById('serviceDescEs').value.trim()
+                    : document.getElementById('serviceDescEn').value.trim(),
+                img: `https://picsum.photos/seed/${idForImg}/300/200.jpg`,
+                active: document.getElementById('serviceActive').checked
+            };
+
+            try {
+                const result = await DatabaseService.saveService(newService);
+                if (result.success) {
+                    showToast(translations[state.currentLanguage]['serviceAdded'] || 'Service added successfully', 'success');
+                    modal.classList.remove('active');
+                    AdminController.renderAdminServices(state, elements);
+                } else {
+                    showToast('Error adding service', 'error');
+                }
+            } catch (error) {
+                console.error("Error adding service:", error);
                 showToast('Error adding service', 'error');
             }
-        } catch (error) {
-            console.error("Error adding service:", error);
-            showToast('Error adding service', 'error');
-        }
-    });
-}
+        });
+    }
 
     // =============== SERVICIOS (MODAL EDITAR) ===============
     static async showEditServiceModal(state, elements, serviceId) {

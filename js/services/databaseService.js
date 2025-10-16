@@ -342,26 +342,25 @@ export class DatabaseService {
             return { success: false, error: error.message };
         }
     }
-
-    static async updateAppointment(appointmentId, appointmentData) {
+    static async updateAppointment(id, updatedData) {
         try {
             const appointments = JSON.parse(localStorage.getItem('appointments')) || [];
-            const appointmentIndex = appointments.findIndex(a => a.id === appointmentId);
+            const index = appointments.findIndex(a => a.id === id);
 
-            if (appointmentIndex !== -1) {
-                appointments[appointmentIndex] = {
-                    ...appointments[appointmentIndex],
-                    ...appointmentData,
-                    updatedAt: new Date().toISOString()
+            if (index !== -1) {
+                appointments[index] = {
+                    ...appointments[index],
+                    ...updatedData
                 };
-                localStorage.setItem('appointments', JSON.stringify(appointments));
-                return { success: true };
+                localStorage.setItem('appointments', JSON.stringify(appointments)); // 🔹 Guardar cambios
+                return { success: true, data: appointments[index] };
             } else {
-                return { success: false, error: "Appointment not found" };
+                console.warn('No appointment found with ID:', id);
+                return { success: false, error: 'Appointment not found' };
             }
         } catch (error) {
-            console.error("Error updating appointment:", error);
-            return { success: false, error: error.message };
+            console.error('Error updating appointment:', error);
+            return { success: false, error };
         }
     }
 

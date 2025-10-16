@@ -98,13 +98,7 @@
                                 <label for="registerPassword" data-i18n="register.password">Password</label>
                                 <input type="password" id="registerPassword" required>
                             </div>
-                            <div class="form-group">
-                                <label for="registerRole" data-i18n="register.role">Account Type</label>
-                                <select id="registerRole">
-                                    <option value="client" data-i18n="register.client">Client</option>
-                                    <option value="admin" data-i18n="register.admin">Admin</option>
-                                </select>
-                            </div>
+
                             <button type="submit" class="btn btn-primary" data-i18n="register.submit">Create
                                 Account</button>
                         </form>
@@ -389,6 +383,8 @@
                 <div class="admin-tab-content">
                     <div id="calendarTab" class="admin-tab-pane active">
                         <div id="adminCalendar" class="admin-calendar">
+                            <div id="appointmentsForDay" class="appointments-day-panel"></div>
+
                             <!-- Admin calendar will be dynamically generated -->
                         </div>
                     </div>

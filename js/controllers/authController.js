@@ -93,30 +93,130 @@ export class AuthController {
         }
     }
 
+    static async handleLogin(e, state, { showUserInterface, setLanguage }) {
+    e.preventDefault();
+    console.log('Login form submitted');
+
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+
+    // Permitir excepción para el administrador
+    const isAdmin = email === 'admin@trimtime.com' && password === 'admin123';
+
+    // === Validación del email solo si NO es admin ===
+    if (!isAdmin) {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+        if (!emailRegex.test(email)) {
+            showToast('Por favor usa un correo válido de Gmail (ej: usuario@gmail.com)', 'error');
+            return;
+        }
+
+        // === Validación de contraseña solo si NO es admin ===
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+        if (!passwordRegex.test(password)) {
+            showToast('La contraseña debe tener al menos 8 caracteres, incluyendo mayúsculas, minúsculas, números y un símbolo.', 'error');
+            return;
+        }
+    }
+
+    console.log('Login attempt with email:', email);
+
+    // === Modo administrador (acceso directo) ===
+    if (isAdmin) {
+        console.log('Admin login detected');
+        const usersResult = await DatabaseService.getUsers();
+
+        if (usersResult.success) {
+            const adminUser = usersResult.data.find(u => u.email === email);
+
+            // Si ya existe, iniciar sesión con él
+            if (adminUser) {
+                state.currentUser = adminUser;
+                sessionStorage.setItem('currentUser', JSON.stringify(state.currentUser));
+                showToast('Inicio de sesión como administrador exitoso', 'success');
+                showUserInterface();
+                return;
+            } else {
+                // Si no existe, crearlo automáticamente (opcional)
+                const newAdmin = {
+                    id: generateId(),
+                    email,
+                    role: 'admin',
+                    name: 'Administrador',
+                    phone: '',
+                    lang: 'es',
+                    photo: 'https://i.imgur.com/hmYb0aM.png',
+                    prefBarber: '',
+                    prefService: '',
+                    push: false
+                };
+                await DatabaseService.saveUser(newAdmin);
+                state.currentUser = newAdmin;
+                sessionStorage.setItem('currentUser', JSON.stringify(state.currentUser));
+                showToast('Administrador creado e iniciado correctamente', 'success');
+                showUserInterface();
+                return;
+            }
+        }
+    }
+
+    // === Autenticación normal ===
+    const usersResult = await DatabaseService.getUsers();
+
+    if (usersResult.success) {
+        const user = usersResult.data.find(u => u.email === email);
+
+        if (user) {
+            state.currentUser = user;
+            sessionStorage.setItem('currentUser', JSON.stringify(state.currentUser));
+
+            if (state.currentUser.lang) setLanguage(state.currentUser.lang);
+
+            showToast('Inicio de sesión exitoso', 'success');
+            showUserInterface();
+        } else {
+            showToast('Correo o contraseña incorrectos', 'error');
+        }
+    } else {
+        showToast('Error cargando usuarios', 'error');
+    }
+}
+
+
+
     static async handleRegister(e, state, { showUserInterface }) {
         e.preventDefault();
         console.log('Register form submitted');
 
-        const name = document.getElementById('registerName').value;
-        const email = document.getElementById('registerEmail').value;
-        const phone = document.getElementById('registerPhone').value;
-        const password = document.getElementById('registerPassword').value;
-        const role = document.getElementById('registerRole').value;
+        const name = document.getElementById('registerName').value.trim();
+        const email = document.getElementById('registerEmail').value.trim();
+        const phone = document.getElementById('registerPhone').value.trim();
+        const password = document.getElementById('registerPassword').value.trim();
+        const role = 'client';
 
-        console.log('Registration attempt:', { name, email, role });
+        // === Validación del email ===
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+        if (!emailRegex.test(email)) {
+            showToast('Por favor usa un correo válido de Gmail (ej: usuario@gmail.com)', 'error');
+            return;
+        }
 
-        // Verificar si el correo ya está registrado
+        // === Validación de contraseña ===
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+        if (!passwordRegex.test(password)) {
+            showToast('La contraseña debe tener al menos 8 caracteres, incluyendo mayúsculas, minúsculas, números y un símbolo.', 'error');
+            return;
+        }
+
         const usersResult = await DatabaseService.getUsers();
 
         if (usersResult.success) {
             const existingUser = usersResult.data.find(u => u.email === email);
-
             if (existingUser) {
-                showToast('Email already registered', 'error');
+                showToast('Este correo ya está registrado', 'error');
                 return;
             }
 
-            // Crear nuevo usuario
             const newUser = {
                 id: generateId(),
                 email,
@@ -135,14 +235,14 @@ export class AuthController {
             if (result.success) {
                 state.currentUser = newUser;
                 sessionStorage.setItem('currentUser', JSON.stringify(state.currentUser));
-
-                showToast('Registration successful! Welcome to Trim Time!', 'success');
+                showToast('¡Registro exitoso! Bienvenido a Trim Time.', 'success');
                 showUserInterface();
             } else {
-                showToast('Error saving user data', 'error');
+                showToast('Error guardando el usuario', 'error');
             }
         } else {
-            showToast('Error loading users', 'error');
+            showToast('Error cargando usuarios', 'error');
         }
     }
+
 }

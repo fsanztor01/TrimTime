@@ -59,7 +59,8 @@ body {
 
 .header-layout {
     display: flex;
-    justify-content: center; /* Centrado de los elementos */
+    justify-content: center;
+    /* Centrado de los elementos */
     align-items: center;
     width: 100%;
 }
@@ -68,25 +69,30 @@ body {
     flex: 0 0 auto;
     display: flex;
     align-items: center;
-    width: 60px; /* Espacio reservado para mantener equilibrio */
+    width: 60px;
+    /* Espacio reservado para mantener equilibrio */
 }
 
 .header-center {
     display: flex;
-    justify-content: center; /* Asegura que los elementos se centren */
+    justify-content: center;
+    /* Asegura que los elementos se centren */
     align-items: center;
-    gap: 30px; /* Ajusta el espacio entre el logo y el icono */
+    gap: 30px;
+    /* Ajusta el espacio entre el logo y el icono */
 }
+
 .header-right {
     flex: 0 0 auto;
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    width: 60px; /* Espacio reservado para el botón de admin */
+    width: 60px;
+    /* Espacio reservado para el botón de admin */
 }
 
 .header-center .logo {
-    flex: 0 0 ;
+    flex: 0 0;
 }
 
 .icon-btn {
@@ -124,10 +130,14 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    position: absolute; /* Mantiene el botón separado */
-    right: 20px; /* Posición a la derecha */
-    top: 50%; /* Centrando verticalmente */
-    transform: translateY(-50%); /* Ajuste fino para el centrado vertical */
+    position: absolute;
+    /* Mantiene el botón separado */
+    right: 20px;
+    /* Posición a la derecha */
+    top: 50%;
+    /* Centrando verticalmente */
+    transform: translateY(-50%);
+    /* Ajuste fino para el centrado vertical */
 }
 
 #adminNavBtn .icon {
@@ -135,7 +145,8 @@ body {
 }
 
 #adminNavBtn .label {
-    display: none; /* Ocultar etiqueta en móvil */
+    display: none;
+    /* Ocultar etiqueta en móvil */
 }
 
 /* Mostrar etiqueta en pantallas más grandes */
@@ -147,20 +158,22 @@ body {
 
 /* Responsive adjustments */
 @media (max-width: 480px) {
+
     .header-left,
     .header-right {
         width: 40px;
     }
-    
+
     .header-center {
         gap: 0.5rem;
     }
-    
+
     .icon-btn {
         padding: 0.4rem;
         font-size: 1.3rem;
     }
 }
+
 /* ===== Main Content ===== */
 .main {
     padding-bottom: 80px;
@@ -182,6 +195,7 @@ body {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1184,6 +1198,7 @@ body {
         transform: translateY(50px);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
@@ -1288,7 +1303,7 @@ body {
     color: var(--bg-color);
     border-radius: 20px;
     padding: 0.5rem 1rem;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
     font-weight: 700;
     transition: var(--transition);
 }
@@ -1296,7 +1311,7 @@ body {
 .main-btn:hover {
     background-color: #B8941F;
     transform: translateY(-18px);
-    box-shadow: 0 8px 18px rgba(0,0,0,0.4);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
 }
 
 /* ===== Loading Indicator ===== */
@@ -1325,8 +1340,13 @@ body {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .loading-indicator p {
@@ -1463,4 +1483,74 @@ textarea:focus {
 
 .skip-to-content:focus {
     top: 0;
+}
+
+.calendar-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* 🔹 Centra el número verticalmente */
+    padding: 6px 0;
+    width: 100px;
+    /* 🔹 Un poco más ancho */
+    height: 100px;
+    /* 🔹 Un poco más alto */
+    position: relative;
+    font-size: 15px;
+    /* 🔹 Número más visible */
+    border-radius: 6px;
+    transition: background 0.2s, transform 0.1s;
+    cursor: pointer;
+}
+
+.calendar-day:hover {
+    background: rgba(255, 215, 0, 0.25);
+    /* 🔹 Hover dorado suave */
+    transform: scale(1.03);
+    /* 🔹 Pequeño efecto de zoom */
+}
+
+.day-number {
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 4px;
+    /* 🔹 Espacio entre número y círculos */
+}
+
+.day-indicators {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-top: 2px;
+}
+
+.status-circle {
+    width: 16px;
+    /* 🔹 Un poco más grandes */
+    height: 16px;
+    border-radius: 50%;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* 🔧 FIX SCROLL FANTASMA DEL BOTTOM NAV */
+#bottomNav,
+.bottom-nav {
+  overflow: hidden !important; /* elimina el scroll interno */
+  height: auto !important;     /* evita desbordes de altura */
+  max-height: none !important;
+}
+
+html, body {
+  overflow: hidden !important; /* evita scroll general si se hereda */
+}
+
+main {
+  overflow: visible !important; /* mantiene el resto visible */
 }
