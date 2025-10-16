@@ -213,12 +213,12 @@ export class AdminController {
         const header = document.createElement('div');
         header.className = 'calendar-header';
         header.innerHTML = `
-        <h3>${monthName} ${year}</h3>
-        <div class="calendar-nav">
-            <button class="btn btn-secondary" id="adminPrevMonth">◀</button>
-            <button class="btn btn-secondary" id="adminNextMonth">▶</button>
-        </div>
-    `;
+    <h3>${monthName} ${year}</h3>
+    <div class="calendar-nav">
+        <button class="btn btn-secondary" id="adminPrevMonth">◀</button>
+        <button class="btn btn-secondary" id="adminNextMonth">▶</button>
+    </div>
+`;
 
         // Contenedor base
         container.innerHTML = '';
@@ -265,12 +265,21 @@ export class AdminController {
             for (let day = 1; day <= daysInMonth; day++) {
                 const cell = document.createElement('div');
                 cell.className = 'calendar-day';
+
+                // Responsive styling based on screen size
+                const isMobile = window.innerWidth <= 768;
+                if (isMobile) {
+                    cell.style.minHeight = '50px';
+                    cell.style.padding = '2px';
+                } else {
+                    cell.style.minHeight = '80px';
+                    cell.style.padding = '6px 4px';
+                }
+
                 cell.style.display = 'flex';
                 cell.style.flexDirection = 'column';
                 cell.style.alignItems = 'center';
                 cell.style.justifyContent = 'flex-start';
-                cell.style.minHeight = '80px';
-                cell.style.padding = '6px 4px';
                 cell.style.textAlign = 'center';
 
                 // Número del día
@@ -278,15 +287,15 @@ export class AdminController {
                 numberEl.className = 'day-number';
                 numberEl.textContent = day;
                 numberEl.style.fontWeight = '700';
-                numberEl.style.fontSize = '16px';
-                numberEl.style.marginBottom = '6px';
+                numberEl.style.fontSize = isMobile ? '12px' : '16px';
+                numberEl.style.marginBottom = isMobile ? '2px' : '6px';
                 cell.appendChild(numberEl);
 
                 // Contenedor de círculos
                 const indicators = document.createElement('div');
                 indicators.className = 'day-indicators';
                 indicators.style.display = 'flex';
-                indicators.style.gap = '4px';
+                indicators.style.gap = isMobile ? '2px' : '4px';
                 indicators.style.flexWrap = 'wrap';
                 indicators.style.justifyContent = 'center';
                 indicators.style.alignItems = 'center';
@@ -322,13 +331,13 @@ export class AdminController {
                         if (count > 0) {
                             const badge = document.createElement('div');
                             badge.className = 'status-circle';
-                            badge.style.minWidth = '20px';
-                            badge.style.height = '20px';
+                            badge.style.minWidth = isMobile ? '12px' : '20px';
+                            badge.style.height = isMobile ? '12px' : '20px';
                             badge.style.borderRadius = '50%';
                             badge.style.display = 'flex';
                             badge.style.alignItems = 'center';
                             badge.style.justifyContent = 'center';
-                            badge.style.fontSize = '11px';
+                            badge.style.fontSize = isMobile ? '8px' : '11px';
                             badge.style.fontWeight = '700';
                             badge.style.color = '#fff';
                             badge.style.backgroundColor = COLORS[status];

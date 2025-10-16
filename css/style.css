@@ -1539,18 +1539,77 @@ textarea:focus {
     align-items: center;
     justify-content: center;
 }
-/* 🔧 FIX SCROLL FANTASMA DEL BOTTOM NAV */
+
 #bottomNav,
 .bottom-nav {
-  overflow: hidden !important; /* elimina el scroll interno */
-  height: auto !important;     /* evita desbordes de altura */
-  max-height: none !important;
+    overflow: auto !important;
+    /* elimina el scroll interno */
+    height: auto !important;
+    /* evita desbordes de altura */
+    max-height: none !important;
 }
 
-html, body {
-  overflow: hidden !important; /* evita scroll general si se hereda */
+html,
+body {
+    overflow: auto !important;
+    /* evita scroll general si se hereda */
 }
 
 main {
-  overflow: visible !important; /* mantiene el resto visible */
+    overflow: visible !important;
+    /* mantiene el resto visible */
+}
+
+/* Calendario visible entero sin scroll ni desbordar */
+#adminCalendar {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--background-secondary, #1e1e1e);
+    border-radius: 10px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* La rejilla base */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+}
+
+/* Celdas normales */
+.calendar-day {
+    background: var(--card-bg, #2c2c2c);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color, #fff);
+    font-size: 0.8rem;
+    transition: background 0.2s ease;
+}
+
+/* ===== Versión móvil ===== */
+@media (max-width: 480px) {
+    #adminCalendar {
+        height: calc(100vh - 200px);
+        /* ocupa el espacio visible sin cortar */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .calendar-grid {
+        flex: 1;
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        grid-template-rows: repeat(6, 1fr);
+        /* siempre 6 filas visibles */
+        height: 100%;
+    }
+
+    .calendar-day {
+        font-size: 0.6rem;
+        border-radius: 4px;
+    }
 }
