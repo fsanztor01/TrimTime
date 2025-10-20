@@ -583,20 +583,69 @@ function updateBookingStep() {
         currentStepElement.classList.add('active');
     }
 
-    // Update navigation buttons
+    // Actualizar navegación
     if (elements.prevStep) {
         elements.prevStep.disabled = state.currentBookingStep === 1;
     }
+    
     if (elements.nextStep) {
-        // CORRECCIÓN: No deshabilitar el botón Next en el paso 4
-        elements.nextStep.disabled = state.currentBookingStep === 1;
+        elements.nextStep.disabled = state.currentBookingStep === 4;
+        
+        // Cambiar texto según el paso
+        if (state.currentBookingStep === 4) {
+            elements.nextStep.textContent = translations[state.currentLanguage]['nav.appointments'] || 'My Appointments';
+            elements.nextStep.style.display = 'none'; // 🔥 Ocultar en paso 4
+        } else {
+            elements.nextStep.textContent = translations[state.currentLanguage]['booking.next'] || 'Next';
+            elements.nextStep.style.display = 'inline-block'; // 🔥 Mostrar en otros pasos
+        }
+    }
+
+    // Mostrar/ocultar botón Confirmar
+    if (elements.confirmBooking) {
+        elements.confirmBooking.style.display = state.currentBookingStep === 4 ? 'block' : 'none';
     }
 
     // Render step content
     renderBookingStep();
 }
-
 async function renderBookingStep() {
+    console.log('Rendering booking step:', state.currentBookingStep);
+    
+    // Hide all steps
+    document.querySelectorAll('.step').forEach(step => {
+        step.classList.remove('active');
+    });
+
+    // Show current step
+    const currentStepElement = document.getElementById(`step${state.currentBookingStep}`);
+    if (currentStepElement) {
+        currentStepElement.classList.add('active');
+    }
+
+    // 🔥 CORRECCIÓN: Comportamiento consistente del botón Next
+    if (elements.prevStep) {
+        elements.prevStep.disabled = state.currentBookingStep === 1;
+    }
+    
+    if (elements.nextStep) {
+        elements.nextStep.disabled = state.currentBookingStep === 4;
+        
+        if (state.currentBookingStep === 4) {
+            elements.nextStep.textContent = translations[state.currentLanguage]['nav.appointments'] || 'My Appointments';
+            elements.nextStep.style.display = 'none'; // 🔥 Ocultar en paso 4
+        } else {
+            elements.nextStep.textContent = translations[state.currentLanguage]['booking.next'] || 'Next';
+            elements.nextStep.style.display = 'inline-block'; // 🔥 Mostrar en otros pasos
+        }
+    }
+
+    // 🔥 CORRECCIÓN: Mostrar botón Confirmar solo en paso 4
+    if (elements.confirmBooking) {
+        elements.confirmBooking.style.display = state.currentBookingStep === 4 ? 'block' : 'none';
+    }
+
+    // Render step content
     switch (state.currentBookingStep) {
         case 1:
             await BookingController.renderServiceSelection(state, elements);
@@ -612,7 +661,6 @@ async function renderBookingStep() {
             break;
     }
 }
-
 // Appointments
 async function renderAppointments() {
     showLoading(true);
@@ -763,13 +811,7 @@ async function rescheduleAppointment(appointmentId) {
             const appointment = result.data.find(a => a.id === appointmentId);
 
             if (appointment) {
-                // NO cancelamos la cita actual todavía, solo la marcamos como "en reprogramación"
-                await DatabaseService.updateAppointment(appointmentId, { 
-                    status: 'rescheduling',
-                    originalStatus: appointment.status // Guardamos el estado original
-                });
-
-                // Pre-fill booking data con los detalles de la cita
+                // Obtener servicios y barberos
                 const servicesResult = await DatabaseService.getServices(true);
                 const barbersResult = await DatabaseService.getBarbers(true);
 
@@ -777,20 +819,23 @@ async function rescheduleAppointment(appointmentId) {
                     const services = servicesResult.data;
                     const barbers = barbersResult.data;
 
+                    // 🔥 CORRECCIÓN: Resetear completamente los datos de booking
                     state.bookingData = {
-                        service: services.find(s => s.id === appointment.service_id),
-                        barber: barbers.find(b => b.id === appointment.employee_id),
-                        date: null, // No preseleccionamos fecha para que el usuario elija
+                        service: null, // No preseleccionar servicio
+                        barber: null,  // No preseleccionar barbero
+                        date: null,
                         time: null,
-                        originalAppointmentId: appointmentId // Guardamos referencia a la cita original
+                        originalAppointmentId: appointmentId // Guardar referencia
                     };
 
+                    // 🔥 CORRECCIÓN: Empezar desde el paso 1 (selección de servicio)
+                    state.currentBookingStep = 1;
+                    
                     // Ir a la página de reserva
                     showPage('bookAppointmentPage');
-                    state.currentBookingStep = 3; // Ir directamente a selección de fecha/hora
                     updateBookingStep();
 
-                    showToast('Por favor selecciona una nueva fecha y hora', 'info');
+                    showToast('Por favor selecciona un nuevo servicio, barbero, fecha y hora', 'info');
                 }
             }
         }
@@ -1077,3 +1122,38 @@ export {
     updateAppointmentsUI,
     logout
 };
+
+// DEBUG: Verificar estado del botón Next
+setTimeout(() => {
+    const nextBtn = document.getElementById('nextStep');
+    if (nextBtn) {
+        console.log('Next button state:', {
+            disabled: nextBtn.disabled,
+            text: nextBtn.textContent,
+            step: state.currentBookingStep
+        });
+    }
+}, 100);
+
+// Añade esta función en js/app.js
+function resetBookingAfterConfirmation() {
+    console.log('Resetting booking data after confirmation...');
+    state.bookingData = {
+        service: null,
+        barber: null,
+        date: null,
+        time: null,
+        originalAppointmentId: null
+    };
+    state.currentBookingStep = 1;
+    
+    // También resetear la UI
+    if (elements.nextStep) {
+        elements.nextStep.style.display = 'inline-block';
+        elements.nextStep.disabled = false;
+        elements.nextStep.textContent = translations[state.currentLanguage]['booking.next'] || 'Next';
+    }
+    if (elements.confirmBooking) {
+        elements.confirmBooking.style.display = 'none';
+    }
+}

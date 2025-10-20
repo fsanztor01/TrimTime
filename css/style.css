@@ -1613,3 +1613,116 @@ main {
         border-radius: 4px;
     }
 }
+
+/* ===== Tema Claro para Calendario Admin ===== */
+[data-theme="light"] .admin-calendar {
+    background: #ffffff !important;
+    border: 1px solid #e0e0e0 !important;
+}
+
+[data-theme="light"] .calendar-grid {
+    background: #ffffff !important;
+}
+
+[data-theme="light"] .calendar-day {
+    background: #f8f9fa !important;
+    color: #333333 !important;
+    border: 1px solid #e9ecef !important;
+}
+
+[data-theme="light"] .calendar-day:hover {
+    background: #e9ecef !important;
+    border-color: #dee2e6 !important;
+}
+
+[data-theme="light"] .calendar-day.today {
+    background: #fff3cd !important;
+    border-color: #ffc107 !important;
+    color: #856404 !important;
+}
+
+[data-theme="light"] .calendar-day.selected {
+    background: #c79708 !important;
+    color: #ffffff !important;
+    border-color: #c79708 !important;
+}
+
+[data-theme="light"] .calendar-day.disabled {
+    background: #f8f9fa !important;
+    color: #6c757d !important;
+    opacity: 0.6 !important;
+    border-color: #dee2e6 !important;
+}
+
+[data-theme="light"] .calendar-day-header {
+    background: #f8f9fa !important;
+    color: #495057 !important;
+    border-bottom: 1px solid #dee2e6 !important;
+}
+
+[data-theme="light"] .calendar-header {
+    background: #f8f9fa !important;
+    color: #333333 !important;
+    border-bottom: 1px solid #dee2e6 !important;
+}
+
+[data-theme="light"] .status-circle {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+    font-weight: 600 !important;
+}
+
+[data-theme="light"] .day-number {
+    color: #333333 !important;
+    font-weight: 700 !important;
+}
+
+/* Asegurar que el contenedor principal también tenga fondo claro */
+[data-theme="light"] #adminCalendar {
+    background: #ffffff !important;
+}
+
+[data-theme="light"] .admin-tab-pane {
+    background: #ffffff !important;
+}
+
+[data-theme="light"] .admin-card {
+    background: #ffffff !important;
+    border: 1px solid #e0e0e0 !important;
+    color: #333333 !important;
+}
+
+[data-theme="light"] .appointment-card {
+    background: #ffffff !important;
+    border: 1px solid #e0e0e0 !important;
+    color: #333333 !important;
+}
+
+/* Botones en tema claro */
+[data-theme="light"] .btn-secondary {
+    background: #6c757d !important;
+    color: #ffffff !important;
+    border: 1px solid #6c757d !important;
+}
+
+[data-theme="light"] .btn-secondary:hover {
+    background: #545b62 !important;
+    border-color: #545b62 !important;
+}
+
+[data-theme="light"] .btn-primary {
+    background: #c79708 !important;
+    color: #ffffff !important;
+    border: 1px solid #c79708 !important;
+}
+
+[data-theme="light"] .btn-primary:hover {
+    background: #c79708 !important;
+    border-color: #c79708 !important;
+}
+
+
+
+/* Ocultar el botón Book Another si no lo usas */
+#bookAnother {
+    display: none !important;
+}

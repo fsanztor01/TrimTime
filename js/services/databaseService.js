@@ -609,4 +609,20 @@ export class DatabaseService {
         // Para esta simulación, simplemente devolvemos una función que no hace nada
         return () => { };
     }
+
+    static async getAppointment(appointmentId) {
+    try {
+        const appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+        const appointment = appointments.find(a => a.id === appointmentId);
+        
+        if (appointment) {
+            return { success: true, data: appointment };
+        } else {
+            return { success: false, error: "Appointment not found" };
+        }
+    } catch (error) {
+        console.error("Error getting appointment:", error);
+        return { success: false, error: error.message };
+    }
+}
 }
