@@ -1,5 +1,7 @@
 // js/services/databaseService.js
 // Database Service Class - Versión Local
+import { generateId } from '../utils/constants.js';
+
 export class DatabaseService {
     // Inicializar datos por defecto si no existen
     static initializeData() {
@@ -611,18 +613,90 @@ export class DatabaseService {
     }
 
     static async getAppointment(appointmentId) {
-    try {
-        const appointments = JSON.parse(localStorage.getItem('appointments')) || [];
-        const appointment = appointments.find(a => a.id === appointmentId);
-        
-        if (appointment) {
-            return { success: true, data: appointment };
-        } else {
-            return { success: false, error: "Appointment not found" };
+        try {
+            const appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+            const appointment = appointments.find(a => a.id === appointmentId);
+
+            if (appointment) {
+                return { success: true, data: appointment };
+            } else {
+                return { success: false, error: "Appointment not found" };
+            }
+        } catch (error) {
+            console.error("Error getting appointment:", error);
+            return { success: false, error: error.message };
         }
-    } catch (error) {
-        console.error("Error getting appointment:", error);
-        return { success: false, error: error.message };
     }
-}
+
+    static async saveRating(ratingData) {
+        try {
+            const ratings = JSON.parse(localStorage.getItem('ratings')) || [];
+            ratings.push({ ...ratingData, id: generateId() });
+            localStorage.setItem('ratings', JSON.stringify(ratings));
+            return { success: true };
+        } catch (error) {
+            console.error('Error saving rating:', error);
+            return { success: false, error: 'Error saving rating' };
+        }
+    }
+
+    static async submitRating(ratingData) {
+        try {
+            // Save the rating
+            const ratingResult = await this.saveRating(ratingData);
+            
+            if (ratingResult.success) {
+                // Update the appointment to mark it as rated
+                const appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+                const appointmentIndex = appointments.findIndex(a => a.id === ratingData.appointmentId);
+                
+                if (appointmentIndex !== -1) {
+                    appointments[appointmentIndex].rated = true;
+                    localStorage.setItem('appointments', JSON.stringify(appointments));
+                }
+                
+                // Update barber rating
+                const barbers = JSON.parse(localStorage.getItem('barbers')) || [];
+                const barberIndex = barbers.findIndex(b => b.id === ratingData.barberId);
+                
+                if (barberIndex !== -1) {
+                    const barberRatings = await this.getRatings(ratingData.barberId);
+                    const newRating = barberRatings.length > 0 
+                        ? barberRatings.reduce((sum, rating) => sum + rating, 0) / barberRatings.length
+                        : 0;
+                    
+                    barbers[barberIndex].rating = Math.round(newRating * 10) / 10;
+                    localStorage.setItem('barbers', JSON.stringify(barbers));
+                }
+                
+                return { success: true };
+            }
+            
+            return ratingResult;
+        } catch (error) {
+            console.error('Error submitting rating:', error);
+            return { success: false, error: 'Error submitting rating' };
+        }
+    }
+
+    static async getRatings(barberId) {
+        try {
+            const ratings = JSON.parse(localStorage.getItem('ratings')) || [];
+            return ratings
+                .filter(r => r.barberId === barberId)
+                .map(r => r.barberRating);
+        } catch (error) {
+            console.error('Error getting ratings:', error);
+            return [];
+        }
+    }
+
+    static async getAllRatings() {
+        try {
+            return JSON.parse(localStorage.getItem('ratings')) || [];
+        } catch (error) {
+            console.error('Error getting all ratings:', error);
+            return [];
+        }
+    }
 }

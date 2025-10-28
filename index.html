@@ -377,6 +377,7 @@
                         data-i18n="admin.appointments">Appointments</button>
                     <button class="admin-tab-btn" data-tab="services" data-i18n="admin.services">Services</button>
                     <button class="admin-tab-btn" data-tab="barbers" data-i18n="admin.barbers">Barbers</button>
+                    <button class="admin-tab-btn" data-tab="ratings" data-i18n="admin.ratings">Ratings</button>
                     <button class="admin-tab-btn" data-tab="stats" data-i18n="admin.stats">Statistics</button>
                 </div>
 
@@ -384,8 +385,25 @@
                     <div id="calendarTab" class="admin-tab-pane active">
                         <div id="adminCalendar" class="admin-calendar">
                             <div id="appointmentsForDay" class="appointments-day-panel"></div>
-
                             <!-- Admin calendar will be dynamically generated -->
+                        </div>
+                    </div>
+
+                    <div id="ratingsTab" class="admin-tab-pane">
+                        <div class="ratings-container">
+                            <div class="ratings-summary">
+                                <div class="rating-stat">
+                                    <h4 data-i18n="admin.avgBarberRating">Average Barber Rating</h4>
+                                    <p id="avgBarberRating" class="stat-value">0.0</p>
+                                </div>
+                                <div class="rating-stat">
+                                    <h4 data-i18n="admin.avgAppRating">Average App Rating</h4>
+                                    <p id="avgAppRating" class="stat-value">0.0</p>
+                                </div>
+                            </div>
+                            <div id="ratingsList" class="ratings-list">
+                                <!-- Ratings will be dynamically added here -->
+                            </div>
                         </div>
                     </div>
 
@@ -515,6 +533,43 @@
             <div class="spinner"></div>
             <p>Loading...</p>
         </div>
+    </main>
+    <!-- Rating Modal -->
+    <div id="ratingModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3 data-i18n="rating.title">Rate your experience</h3>
+            <div class="rating-form">
+                <div class="rating-section">
+                    <h4 data-i18n="rating.barberTitle">Rate your barber</h4>
+                    <div class="stars-container" id="barberStars">
+                        <span class="star" data-value="1">★</span>
+                        <span class="star" data-value="2">★</span>
+                        <span class="star" data-value="3">★</span>
+                        <span class="star" data-value="4">★</span>
+                        <span class="star" data-value="5">★</span>
+                    </div>
+                </div>
+                <div class="rating-section">
+                    <h4 data-i18n="rating.appTitle">Rate the app</h4>
+                    <div class="stars-container" id="appStars">
+                        <span class="star" data-value="1">★</span>
+                        <span class="star" data-value="2">★</span>
+                        <span class="star" data-value="3">★</span>
+                        <span class="star" data-value="4">★</span>
+                        <span class="star" data-value="5">★</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="ratingComment" data-i18n="rating.comment">Your comment</label>
+                    <textarea id="ratingComment" maxlength="100" rows="3"></textarea>
+                    <small class="char-count"><span id="charCount">0</span>/100</small>
+                </div>
+                <button id="submitRatingBtn" class="btn btn-primary" data-i18n="rating.submit" disabled>Submit
+                    Rating</button>
+            </div>
+        </div>
+    </div>
     </main>
 
     <!-- Bottom Navigation -->

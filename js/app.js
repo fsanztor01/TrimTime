@@ -36,6 +36,8 @@ const state = {
     currentBookingStep: 1,
     realtimeUnsubscribe: null
 };
+window.state = state;
+
 
 // DOM Elements
 const elements = {
@@ -587,10 +589,10 @@ function updateBookingStep() {
     if (elements.prevStep) {
         elements.prevStep.disabled = state.currentBookingStep === 1;
     }
-    
+
     if (elements.nextStep) {
         elements.nextStep.disabled = state.currentBookingStep === 4;
-        
+
         // Cambiar texto según el paso
         if (state.currentBookingStep === 4) {
             elements.nextStep.textContent = translations[state.currentLanguage]['nav.appointments'] || 'My Appointments';
@@ -611,7 +613,7 @@ function updateBookingStep() {
 }
 async function renderBookingStep() {
     console.log('Rendering booking step:', state.currentBookingStep);
-    
+
     // Hide all steps
     document.querySelectorAll('.step').forEach(step => {
         step.classList.remove('active');
@@ -627,10 +629,10 @@ async function renderBookingStep() {
     if (elements.prevStep) {
         elements.prevStep.disabled = state.currentBookingStep === 1;
     }
-    
+
     if (elements.nextStep) {
         elements.nextStep.disabled = state.currentBookingStep === 4;
-        
+
         if (state.currentBookingStep === 4) {
             elements.nextStep.textContent = translations[state.currentLanguage]['nav.appointments'] || 'My Appointments';
             elements.nextStep.style.display = 'none'; // 🔥 Ocultar en paso 4
@@ -766,6 +768,17 @@ async function renderAppointments() {
                             </div>
                         `;
 
+                        // Añadir botón de valoración para citas completadas
+                        if (appointment.status === 'completed' && !appointment.rated) {
+                            card.innerHTML += `
+                                <div class="appointment-actions">
+                                    <button class="rating-btn" onclick="showRatingModal('${appointment.id}', '${service?.name || 'Service'}', '${barber?.name || 'Barber'}', '${barber?.id || ''}')">
+                                        ${translations[state.currentLanguage]['rating.submit'] || 'Rate Service'}
+                                    </button>
+                                </div>
+                            `;
+                        }
+
                         historyContainer.appendChild(card);
                     });
                 }
@@ -781,6 +794,20 @@ async function renderAppointments() {
     }
 }
 
+window.showRatingModal = function(appointmentId, serviceName, barberName, barberId) {
+    const modal = document.getElementById('ratingModal');
+    if (modal) {
+        // Set appointment data for rating
+        modal.dataset.appointmentId = appointmentId;
+        modal.dataset.serviceName = serviceName;
+        modal.dataset.barberName = barberName;
+        modal.dataset.barberId = barberId;
+        modal.classList.add('active');
+        
+        // Initialize rating functionality
+        initializeRatingModal();
+    }
+};
 async function cancelAppointment(appointmentId) {
     if (!confirm('Are you sure you want to cancel this appointment?')) return;
 
@@ -830,7 +857,7 @@ async function rescheduleAppointment(appointmentId) {
 
                     // 🔥 CORRECCIÓN: Empezar desde el paso 1 (selección de servicio)
                     state.currentBookingStep = 1;
-                    
+
                     // Ir a la página de reserva
                     showPage('bookAppointmentPage');
                     updateBookingStep();
@@ -925,6 +952,9 @@ async function renderAdminDashboard() {
     // Render barbers
     AdminController.renderAdminBarbers(state, elements);
 
+    // Render ratings
+    AdminController.renderAdminRatings(state, elements);
+
     // Render statistics
     AdminController.renderAdminStats(state, elements);
 }
@@ -999,13 +1029,14 @@ window.updateAppointmentStatus = async function (appointmentId, newStatus) {
                 modal.classList.remove('active');
             }
 
-            // Refresh admin views
-            AdminController.renderAdminCalendar(state, elements);
+            // Refresh ALL admin views immediately
+            AdminController.refreshAdminCalendar(state, elements);
             AdminController.renderAdminAppointments(state, elements);
-
-            // MEJORA: Actualizar estadísticas inmediatamente cuando se completa un servicio
-            if (newStatus === 'completed') {
-                AdminController.renderAdminStats(state, elements);
+            AdminController.renderAdminStats(state, elements);
+            
+            // Also refresh client appointments if user is viewing them
+            if (state.currentPage === 'myAppointmentsPage') {
+                renderAppointments();
             }
         } else {
             showToast('Error updating appointment', 'error');
@@ -1094,6 +1125,161 @@ window.toggleBarberStatus = async function (barberId) {
     }
 };
 
+// Modal functions
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+// Rating functionality
+function initializeRatingModal() {
+    const modal = document.getElementById('ratingModal');
+    if (!modal) return;
+
+    const appointmentId = modal.dataset.appointmentId;
+    const serviceName = modal.dataset.serviceName;
+    const barberName = modal.dataset.barberName;
+    
+    let barberRating = 0;
+    let appRating = 0;
+
+    // Función para resetear estrellas
+    function resetStars(containerId) {
+        document.querySelectorAll(`${containerId} .star`).forEach(star => {
+            star.style.color = '#ccc'; // Gray
+            star.style.textShadow = 'none';
+            star.style.transform = 'scale(1)';
+            star.style.filter = 'none';
+            star.classList.remove('selected');
+        });
+    }
+
+    // Resetear todas las estrellas al abrir el modal
+    resetStars('#barberStars');
+    resetStars('#appStars');
+    
+    const commentInput = document.getElementById('ratingComment');
+    const charCount = document.getElementById('charCount');
+    if (commentInput) commentInput.value = '';
+    if (charCount) charCount.textContent = '0/100';
+
+    // Barber stars handlers - MÉTODO CORREGIDO
+    document.querySelectorAll('#barberStars .star').forEach(star => {
+        star.onclick = () => {
+            barberRating = parseInt(star.dataset.value);
+            console.log(`Barber rating set to: ${barberRating}`);
+            
+            // Small delay to ensure visual feedback
+            setTimeout(() => {
+                updateStars('#barberStars', barberRating);
+                checkEnableSubmit();
+            }, 50);
+        };
+    });
+
+    // App stars handlers - MÉTODO CORREGIDO
+    document.querySelectorAll('#appStars .star').forEach(star => {
+        star.onclick = () => {
+            appRating = parseInt(star.dataset.value);
+            console.log(`App rating set to: ${appRating}`);
+            
+            // Small delay to ensure visual feedback
+            setTimeout(() => {
+                updateStars('#appStars', appRating);
+                checkEnableSubmit();
+            }, 50);
+        };
+    });
+
+    function updateStars(containerId, rating) {
+        console.log(`Updating ${containerId} with rating: ${rating}`);
+        
+        // Directly set colors to ensure they stay yellow
+        document.querySelectorAll(`${containerId} .star`).forEach((star, index) => {
+            if (index < rating) {
+                star.style.color = '#ffd700'; // Gold/Yellow
+                star.style.textShadow = '0 0 8px rgba(255, 215, 0, 0.8)';
+                star.style.transform = 'scale(1.1)';
+                star.style.filter = 'brightness(1.2)';
+                star.classList.add('selected');
+                console.log(`Star ${index + 1}: YELLOW (SELECTED)`);
+            } else {
+                star.style.color = '#ccc'; // Gray
+                star.style.textShadow = 'none';
+                star.style.transform = 'scale(1)';
+                star.style.filter = 'none';
+                star.classList.remove('selected');
+                console.log(`Star ${index + 1}: GRAY`);
+            }
+        });
+    }
+
+    function checkEnableSubmit() {
+        const submitBtn = document.getElementById('submitRatingBtn');
+        if (submitBtn) {
+            submitBtn.disabled = !(barberRating > 0 && appRating > 0);
+            console.log('Submit button enabled:', !submitBtn.disabled);
+        }
+    }
+
+    // Comment character count
+    if (commentInput && charCount) {
+        commentInput.addEventListener('input', () => {
+            const count = commentInput.value.length;
+            charCount.textContent = `${count}/100`;
+        });
+    }
+
+    // Submit button handler
+    const submitBtn = document.getElementById('submitRatingBtn');
+    if (submitBtn) {
+        submitBtn.onclick = async () => {
+            try {
+                console.log('Submitting rating:', { barberRating, appRating });
+
+                if (!barberRating || !appRating) {
+                    showToast('Please rate both the barber and the app', 'error');
+                    return;
+                }
+
+                const result = await DatabaseService.submitRating({
+                    appointmentId: appointmentId,
+                    barberRating: barberRating,
+                    appRating: appRating,
+                    comment: commentInput ? commentInput.value.trim() : '',
+                    barberId: modal.dataset.barberId || '',
+                    userId: state.currentUser.id
+                });
+
+                if (result.success) {
+                    showToast(translations[state.currentLanguage]['rating.success'] || 'Rating submitted successfully', 'success');
+                    closeModal('ratingModal');
+                    renderAppointments();
+                } else {
+                    showToast(result.error || 'Error submitting rating', 'error');
+                }
+            } catch (error) {
+                console.error('Error submitting rating:', error);
+                showToast('Error submitting rating', 'error');
+            }
+        };
+    }
+
+    // Close modal handlers
+    const closeBtn = modal.querySelector('.close-modal');
+    if (closeBtn) {
+        closeBtn.onclick = () => closeModal('ratingModal');
+    }
+
+    modal.onclick = (e) => {
+        if (e.target === modal) {
+            closeModal('ratingModal');
+        }
+    };
+}
+
 // Export functions for use in other modules
 export {
     state,
@@ -1120,7 +1306,9 @@ export {
     showTab,
     setupRealtimeAppointments,
     updateAppointmentsUI,
-    logout
+    logout,
+    closeModal,
+    initializeRatingModal
 };
 
 // DEBUG: Verificar estado del botón Next
@@ -1146,7 +1334,7 @@ function resetBookingAfterConfirmation() {
         originalAppointmentId: null
     };
     state.currentBookingStep = 1;
-    
+
     // También resetear la UI
     if (elements.nextStep) {
         elements.nextStep.style.display = 'inline-block';

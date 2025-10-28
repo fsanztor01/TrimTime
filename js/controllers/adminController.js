@@ -71,8 +71,17 @@ export class AdminController {
                 const res = await DatabaseService.updateAppointment(id, { status: newStatus });
                 if (res.success) {
                     showToast('Appointment updated', 'success');
+
+                    // Refresh ALL admin views immediately
                     AdminController.renderAdminAppointments(state, elements);
+                    AdminController.renderAdminStats(state, elements);
                     if (typeof window.__redrawAdminCalendar === 'function') window.__redrawAdminCalendar();
+
+                    // Close modal if open
+                    const modal = document.getElementById('appointmentModal');
+                    if (modal) {
+                        modal.classList.remove('active');
+                    }
                 } else {
                     showToast(res.error || 'Error updating appointment', 'error');
                 }
@@ -189,6 +198,9 @@ export class AdminController {
                 break;
             case 'barbers':
                 AdminController.renderAdminBarbers(state, elements);
+                break;
+            case 'ratings':
+                AdminController.renderAdminRatings(state, elements);
                 break;
             case 'stats':
                 AdminController.renderAdminStats(state, elements);
@@ -377,6 +389,12 @@ export class AdminController {
             state.currentYear = (month === 11) ? year + 1 : year;
             AdminController.renderAdminCalendar(state, elements);
         });
+    }
+
+    // Function to refresh calendar when appointments change
+    static refreshAdminCalendar(state, elements) {
+        console.log('Refreshing admin calendar...');
+        AdminController.renderAdminCalendar(state, elements);
     }
 
 
@@ -1021,6 +1039,155 @@ export class AdminController {
     static showFilterModal() {
         showToast('Filter functionality not implemented in this demo', 'warning');
     }
+
+    // =============== RATINGS ===============
+    // =============== RATINGS ===============
+    static async renderAdminRatings(state, elements) {
+        console.log('Rendering admin ratings...');
+        showLoading(true);
+
+        try {
+            const ratingsResult = await DatabaseService.getAllRatings();
+            console.log('Ratings result:', ratingsResult);
+
+            const appointmentsResult = await DatabaseService.getAppointments();
+            const barbersResult = await DatabaseService.getBarbers();
+            const usersResult = await DatabaseService.getUsers();
+            const servicesResult = await DatabaseService.getServices(); // 🔥 AÑADIR ESTO
+
+            console.log('Appointments result:', appointmentsResult);
+            console.log('Barbers result:', barbersResult);
+            console.log('Users result:', usersResult);
+            console.log('Services result:', servicesResult); // 🔥 AÑADIR ESTO
+
+            if (ratingsResult.length > 0 && appointmentsResult.success && barbersResult.success && usersResult.success && servicesResult.success) {
+                const appointments = appointmentsResult.data;
+                const barbers = barbersResult.data;
+                const users = usersResult.data;
+                const services = servicesResult.data; // 🔥 AÑADIR ESTO
+
+                console.log('Found ratings:', ratingsResult.length);
+                console.log('Found appointments:', appointments.length);
+                console.log('Found barbers:', barbers.length);
+                console.log('Found users:', users.length);
+                console.log('Found services:', services.length); // 🔥 AÑADIR ESTO
+
+                // Calculate average ratings
+                const barberRatings = ratingsResult.map(r => r.barberRating);
+                const appRatings = ratingsResult.map(r => r.appRating);
+
+                const avgBarberRating = barberRatings.length > 0
+                    ? (barberRatings.reduce((sum, rating) => sum + rating, 0) / barberRatings.length).toFixed(1)
+                    : '0.0';
+
+                const avgAppRating = appRatings.length > 0
+                    ? (appRatings.reduce((sum, rating) => sum + rating, 0) / appRatings.length).toFixed(1)
+                    : '0.0';
+
+                console.log('Average barber rating:', avgBarberRating);
+                console.log('Average app rating:', avgAppRating);
+
+                // Update summary stats
+                const avgBarberRatingEl = document.getElementById('avgBarberRating');
+                const avgAppRatingEl = document.getElementById('avgAppRating');
+
+                if (avgBarberRatingEl) avgBarberRatingEl.textContent = avgBarberRating;
+                if (avgAppRatingEl) avgAppRatingEl.textContent = avgAppRating;
+
+                // Render ratings list
+                const ratingsListEl = document.getElementById('ratingsList');
+                if (ratingsListEl) {
+                    ratingsListEl.innerHTML = '';
+
+                    ratingsResult.forEach(rating => {
+                        const appointment = appointments.find(a => a.id === rating.appointmentId);
+                        const barber = barbers.find(b => b.id === rating.barberId);
+                        const user = users.find(u => u.id === rating.userId);
+                        const service = services.find(s => s.id === appointment?.service_id); // 🔥 AÑADIR ESTO
+
+                        console.log('Processing rating:', rating);
+                        console.log('Found appointment:', appointment);
+                        console.log('Found barber:', barber);
+                        console.log('Found user:', user);
+                        console.log('Found service:', service); // 🔥 AÑADIR ESTO
+
+                        if (appointment && barber && user) {
+                            // 🔥 CORRECCIÓN: Obtener el nombre del servicio según el idioma
+                            let serviceName = 'Servicio no encontrado';
+                            if (service) {
+                                serviceName = state.currentLanguage === 'es'
+                                    ? (service.nameEs || service.name)
+                                    : (service.nameEn || service.name);
+                            }
+
+                            const ratingCard = document.createElement('div');
+                            ratingCard.className = 'admin-card';
+                            ratingCard.innerHTML = `
+                            <div class="admin-card-header">
+                                <h3>${user.name}</h3>
+                                <span class="appointment-status status-confirmed">
+                                    ${formatDateDisplay(appointment.date)} ${appointment.time}
+                                </span>
+                            </div>
+                            <div class="appointment-details">
+                                <div>👤 Barber: ${barber.name}</div>
+                                <div>✂️ Service: ${serviceName}</div> <!-- 🔥 CAMBIAR AQUÍ -->
+                                <div class="rating-display">
+                                    <div class="rating-item">
+                                        <span>Barber Rating:</span>
+                                        <div class="stars-display">
+                                            ${generateStarsHTML(rating.barberRating)}
+                                        </div>
+                                    </div>
+                                    <div class="rating-item">
+                                        <span>App Rating:</span>
+                                        <div class="stars-display">
+                                            ${generateStarsHTML(rating.appRating)}
+                                        </div>
+                                    </div>
+                                </div>
+                                ${rating.comment ? `<div class="rating-comment">💬 "${rating.comment}"</div>` : ''}
+                            </div>
+                        `;
+                            ratingsListEl.appendChild(ratingCard);
+                        }
+                    });
+                }
+            } else {
+                console.log('No ratings found or error loading data');
+                // No ratings yet
+                const avgBarberRatingEl = document.getElementById('avgBarberRating');
+                const avgAppRatingEl = document.getElementById('avgAppRating');
+                const ratingsListEl = document.getElementById('ratingsList');
+
+                if (avgBarberRatingEl) avgBarberRatingEl.textContent = '0.0';
+                if (avgAppRatingEl) avgAppRatingEl.textContent = '0.0';
+                if (ratingsListEl) {
+                    ratingsListEl.innerHTML = `
+                    <div class="admin-card">
+                        <div class="appointment-details">
+                            <p>${translations[state.currentLanguage]['admin.noRatings'] || 'No ratings yet'}</p>
+                        </div>
+                    </div>
+                `;
+                }
+            }
+        } catch (error) {
+            console.error("Error rendering admin ratings:", error);
+            showToast('Error loading ratings', 'error');
+        } finally {
+            showLoading(false);
+        }
+    }
+}
+
+// Helper function to generate stars HTML
+function generateStarsHTML(rating) {
+    let starsHTML = '';
+    for (let i = 1; i <= 5; i++) {
+        starsHTML += `<span class="star ${i <= rating ? 'active' : ''}">★</span>`;
+    }
+    return starsHTML;
 }
 
 export default AdminController;
