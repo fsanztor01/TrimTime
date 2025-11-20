@@ -133,14 +133,13 @@ function setupEventListeners() {
     if (elements.langToggle) {
         elements.langToggle.addEventListener('click', toggleLanguage);
 
-        // Admin button (engranaje en header)
+        // Admin button (engranaje en header - mobile only)
         const adminBtn = document.getElementById('adminNavBtn');
         if (adminBtn) {
             adminBtn.addEventListener('click', () => {
                 showPage('adminDashboardPage');
             });
         }
-
     }
 
     // Navigation
@@ -222,6 +221,17 @@ function setupEventListeners() {
 
     AdminController.setupEventListeners(state, elements);
 
+    // Handle window resize for admin button positioning
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            if (state.currentUser) {
+                updateNavigation();
+            }
+        }, 150);
+    });
+
     console.log('Event listeners set up successfully');
 }
 
@@ -275,20 +285,7 @@ function showPage(pageId) {
         renderBarbers();
     }
 
-    // Ensure admin button visibility is updated
-    const adminBtn = document.getElementById('adminNavBtn');
-    if (adminBtn) {
-        if (state.currentUser && state.currentUser.role === 'admin') {
-            adminBtn.style.display = 'flex';
-            if (pageId === 'adminDashboardPage') {
-                adminBtn.classList.add('active');
-            } else {
-                adminBtn.classList.remove('active');
-            }
-        } else {
-            adminBtn.style.display = 'none';
-        }
-    }
+    // Admin button visibility is handled in updateNavigation()
 }
 
 function updateNavigation() {
@@ -297,16 +294,51 @@ function updateNavigation() {
 
         // Admin button visibility
         const adminBtn = document.getElementById('adminNavBtn');
+        const isDesktop = window.innerWidth >= 768;
+        
         if (adminBtn) {
             if (state.currentUser.role === 'admin') {
-                adminBtn.style.display = 'flex';
+                if (isDesktop) {
+                    // Desktop: Add admin button to sidebar
+                    addAdminButtonToSidebar();
+                    // Hide from header on desktop
+                    adminBtn.style.display = 'none';
+                } else {
+                    // Mobile: Show in header only (not in bottom nav)
+                    adminBtn.style.display = 'flex';
+                    // Remove any admin button from mobile bottom nav if exists
+                    const mobileAdminBtn = elements.bottomNav.querySelector('.admin-nav-btn, .admin-only, [data-page="adminDashboardPage"]');
+                    if (mobileAdminBtn) {
+                        mobileAdminBtn.remove();
+                    }
+                }
+                
+                // Update active state
                 if (state.currentPage === 'adminDashboardPage') {
                     adminBtn.classList.add('active');
+                    const sidebarAdminBtn = document.querySelector('.admin-nav-btn');
+                    if (sidebarAdminBtn) {
+                        sidebarAdminBtn.classList.add('active');
+                    }
                 } else {
                     adminBtn.classList.remove('active');
+                    const sidebarAdminBtn = document.querySelector('.admin-nav-btn');
+                    if (sidebarAdminBtn) {
+                        sidebarAdminBtn.classList.remove('active');
+                    }
                 }
             } else {
+                // Not admin - hide both
                 adminBtn.style.display = 'none';
+                const sidebarAdminBtn = document.querySelector('.admin-nav-btn');
+                if (sidebarAdminBtn) {
+                    sidebarAdminBtn.remove();
+                }
+                // Also remove from mobile nav if exists
+                const mobileAdminBtn = elements.bottomNav.querySelector('.admin-nav-btn, .admin-only, [data-page="adminDashboardPage"]');
+                if (mobileAdminBtn) {
+                    mobileAdminBtn.remove();
+                }
             }
         }
 
@@ -325,7 +357,49 @@ function updateNavigation() {
         if (adminBtn) {
             adminBtn.style.display = 'none';
         }
+        const sidebarAdminBtn = document.querySelector('.admin-nav-btn');
+        if (sidebarAdminBtn) {
+            sidebarAdminBtn.remove();
+        }
     }
+}
+
+// Add admin button to desktop sidebar
+function addAdminButtonToSidebar() {
+    const bottomNav = elements.bottomNav;
+    if (!bottomNav) return;
+    
+    // Check if already exists
+    const existingAdminBtn = bottomNav.querySelector('.admin-nav-btn');
+    if (existingAdminBtn) return;
+    
+    // Only add on desktop
+    if (window.innerWidth < 768) return;
+    
+    // Create admin button for sidebar
+    const adminBtn = document.createElement('button');
+    adminBtn.className = 'admin-nav-btn';
+    adminBtn.setAttribute('data-page', 'adminDashboardPage');
+    
+    const icon = document.createElement('span');
+    icon.className = 'nav-icon';
+    icon.textContent = '⚙️';
+    
+    const label = document.createElement('span');
+    label.className = 'nav-label';
+    label.setAttribute('data-i18n', 'nav.admin');
+    label.textContent = 'Admin';
+    
+    adminBtn.appendChild(icon);
+    adminBtn.appendChild(label);
+    
+    // Add click handler
+    adminBtn.addEventListener('click', () => {
+        showPage('adminDashboardPage');
+    });
+    
+    // Add to sidebar (at the bottom)
+    bottomNav.appendChild(adminBtn);
 }
 
 
@@ -447,6 +521,7 @@ async function renderBarbers() {
                 result.data.forEach(barber => {
                     const barberCard = document.createElement('div');
                     barberCard.className = 'barber-card';
+                    barberCard.style.cursor = 'pointer';
 
                     // Generate star rating HTML
                     const fullStars = Math.floor(barber.rating);
@@ -476,6 +551,11 @@ async function renderBarbers() {
                         </div>
                     `;
 
+                    // Add click event to show barber profile
+                    barberCard.addEventListener('click', () => {
+                        showBarberProfileModal(barber);
+                    });
+
                     container.appendChild(barberCard);
                 });
             } else {
@@ -488,6 +568,119 @@ async function renderBarbers() {
     } finally {
         showLoading(false);
     }
+}
+
+// Format working days to readable text
+function formatWorkingDays(daysString) {
+    const dayNames = {
+        'en': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        'es': ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+    };
+    
+    const lang = state.currentLanguage || 'en';
+    const dayNamesArray = dayNames[lang];
+    
+    if (!daysString) return '';
+    
+    // Parse days string (e.g., "1-5" or "1-3,5")
+    const parts = daysString.split(',');
+    const dayNumbers = new Set();
+    
+    parts.forEach(part => {
+        if (part.includes('-')) {
+            const [start, end] = part.split('-').map(Number);
+            for (let i = start; i <= end; i++) {
+                if (i >= 1 && i <= 7) {
+                    dayNumbers.add(i);
+                }
+            }
+        } else {
+            const day = Number(part.trim());
+            if (day >= 1 && day <= 7) {
+                dayNumbers.add(day);
+            }
+        }
+    });
+    
+    const sortedDays = Array.from(dayNumbers).sort((a, b) => a - b);
+    return sortedDays.map(day => dayNamesArray[day - 1]).join(', ');
+}
+
+// Show barber profile modal
+function showBarberProfileModal(barber) {
+    const modal = document.getElementById('barberModal');
+    const content = document.getElementById('barberModalContent');
+    
+    if (!modal || !content) return;
+    
+    // Generate star rating HTML
+    const fullStars = Math.floor(barber.rating);
+    const hasHalfStar = barber.rating % 1 !== 0;
+    let starsHTML = '';
+    
+    for (let i = 0; i < fullStars; i++) {
+        starsHTML += '<span class="rating-star">★</span>';
+    }
+    
+    if (hasHalfStar) {
+        starsHTML += '<span class="rating-star">☆</span>';
+    }
+    
+    for (let i = fullStars + (hasHalfStar ? 1 : 0); i < 5; i++) {
+        starsHTML += '<span class="rating-star" style="opacity: 0.3">★</span>';
+    }
+    
+    const workingDays = formatWorkingDays(barber.days);
+    const description = barber.description || (state.currentLanguage === 'es' 
+        ? 'Barbero profesional con experiencia en diversos estilos.' 
+        : 'Professional barber with experience in various styles.');
+    
+    content.innerHTML = `
+        <div class="barber-profile-modal">
+            <div class="barber-profile-photo">
+                <img src="${barber.photo}" alt="${barber.name}">
+            </div>
+            <div class="barber-profile-info">
+                <h2 class="barber-profile-name">${barber.name}</h2>
+                <div class="barber-profile-rating">
+                    ${starsHTML}
+                    <span class="rating-value">${barber.rating.toFixed(1)}</span>
+                </div>
+                <div class="barber-profile-details">
+                    <div class="barber-detail-item">
+                        <span class="detail-label">${state.currentLanguage === 'es' ? 'Horario:' : 'Hours:'}</span>
+                        <span class="detail-value">${barber.hours || 'N/A'}</span>
+                    </div>
+                    <div class="barber-detail-item">
+                        <span class="detail-label">${state.currentLanguage === 'es' ? 'Días de trabajo:' : 'Working days:'}</span>
+                        <span class="detail-value">${workingDays || 'N/A'}</span>
+                    </div>
+                </div>
+                <div class="barber-profile-description">
+                    <h3>${state.currentLanguage === 'es' ? 'Sobre mí' : 'About me'}</h3>
+                    <p>${description}</p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    modal.classList.add('active');
+    
+    // Close modal when clicking outside or on close button
+    const closeModal = () => {
+        modal.classList.remove('active');
+    };
+    
+    const closeBtn = modal.querySelector('.close-modal');
+    if (closeBtn) {
+        closeBtn.onclick = closeModal;
+    }
+    
+    modal.onclick = (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    };
 }
 
 // Services

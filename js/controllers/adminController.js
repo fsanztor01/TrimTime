@@ -1092,6 +1092,10 @@ export class AdminController {
                     <input type="number" id="barberRating" min="0" max="5" step="0.1" value="4.5" required>
                 </div>
                 <div class="form-group">
+                    <label for="barberDescription">Description</label>
+                    <textarea id="barberDescription" rows="3" placeholder="Brief description about the barber..."></textarea>
+                </div>
+                <div class="form-group">
                     <label for="barberPhoto">Barber Photo</label>
                     <input type="file" id="barberPhoto" accept="image/*">
                     <small>Upload a profile photo for this barber</small>
@@ -1152,6 +1156,7 @@ export class AdminController {
                 hours: document.getElementById('barberHours').value.trim(),
                 rating: parseFloat(document.getElementById('barberRating').value),
                 photo: photoData,
+                description: document.getElementById('barberDescription').value.trim() || '',
                 active: document.getElementById('barberActive').checked
             };
 

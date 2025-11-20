@@ -52,9 +52,18 @@ body {
     background-color: var(--surface-color);
     padding: 1rem 0;
     box-shadow: var(--shadow);
-    position: sticky;
+    position: fixed;
     top: 0;
-    z-index: 100;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+@media (min-width: 768px) {
+    .header {
+        padding-left: 90px; /* Space for vertical desktop nav */
+    }
 }
 
 .header-layout {
@@ -149,10 +158,10 @@ body {
     /* Ocultar etiqueta en móvil */
 }
 
-/* Mostrar etiqueta en pantallas más grandes */
+/* Mostrar etiqueta en pantallas más grandes - pero ocultar botón en desktop */
 @media (min-width: 768px) {
-    #adminNavBtn .label {
-        display: inline;
+    #adminNavBtn {
+        display: none !important; /* Hidden in desktop, shown in sidebar */
     }
 }
 
@@ -177,6 +186,7 @@ body {
 /* ===== Main Content ===== */
 .main {
     padding-bottom: 80px;
+    padding-top: 70px; /* Space for fixed header */
     min-height: calc(100vh - 120px);
 }
 
@@ -505,6 +515,7 @@ body {
     text-align: center;
     scroll-snap-align: start;
     transition: var(--transition);
+    cursor: pointer;
 }
 
 .barber-card:hover {
@@ -845,6 +856,11 @@ body {
 
 .calendar-day.disabled:hover {
     background-color: transparent;
+    cursor: not-allowed;
+}
+
+.calendar-day.disabled {
+    cursor: not-allowed;
 }
 
 /* ===== Time Slots ===== */
@@ -880,6 +896,7 @@ body {
 
 .time-slot.disabled:hover {
     background-color: transparent;
+    cursor: not-allowed;
 }
 
 /* ===== Time Slot Filters ===== */
@@ -1413,6 +1430,101 @@ body {
     color: var(--text-color);
 }
 
+/* ===== Barber Profile Modal ===== */
+.barber-profile-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 1rem;
+}
+
+.barber-profile-photo {
+    text-align: center;
+}
+
+.barber-profile-photo img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--primary-color);
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+}
+
+.barber-profile-info {
+    text-align: center;
+}
+
+.barber-profile-name {
+    font-size: 1.8rem;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+.barber-profile-rating {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.barber-profile-rating .rating-star {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.barber-profile-rating .rating-value {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-left: 0.5rem;
+}
+
+.barber-profile-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: var(--bg-color);
+    border-radius: 8px;
+}
+
+.barber-detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.detail-value {
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.barber-profile-description {
+    text-align: left;
+    padding: 1rem;
+    background-color: var(--bg-color);
+    border-radius: 8px;
+}
+
+.barber-profile-description h3 {
+    font-size: 1.2rem;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.barber-profile-description p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
 /* ===== Toast Notification ===== */
 .toast {
     position: fixed;
@@ -1552,6 +1664,601 @@ body {
     z-index: 1;
     font-weight: 800;
     letter-spacing: 0.5px;
+}
+
+/* ============================================
+   DESKTOP STYLES (>= 768px)
+   ============================================ */
+
+@media (min-width: 768px) {
+    /* Desktop Layout Improvements */
+    .container {
+        max-width: 1400px;
+        padding: 0 60px;
+    }
+
+    .main {
+        padding-left: 90px; /* Space for vertical desktop nav */
+        padding-bottom: 0;
+    }
+
+    .page {
+        padding: 4rem 0;
+    }
+
+    /* Typography improvements for desktop */
+    h1 {
+        font-size: 3rem;
+        margin-bottom: 2rem;
+        letter-spacing: -0.5px;
+    }
+
+    h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.3px;
+    }
+
+    h3 {
+        font-size: 1.75rem;
+        margin-bottom: 1.25rem;
+    }
+
+    /* Card improvements for desktop */
+    .action-card,
+    .service-card,
+    .barber-card,
+    .appointment-card {
+        padding: 2.5rem;
+        border-radius: 20px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(212, 175, 55, 0.1);
+    }
+
+    .action-card:hover,
+    .service-card:hover,
+    .barber-card:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 20px 60px rgba(212, 175, 55, 0.25);
+        border-color: rgba(212, 175, 55, 0.3);
+    }
+
+    /* Grid improvements */
+    .services-grid,
+    .quick-actions {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2.5rem;
+    }
+
+    .barbers-list {
+        gap: 2rem;
+        padding: 2rem 0;
+    }
+
+    .barber-card {
+        min-width: 240px;
+        padding: 2rem;
+    }
+
+    .barber-card img {
+        width: 120px;
+        height: 120px;
+    }
+
+    /* Desktop Navigation - Premium Vertical Sidebar */
+    .bottom-nav {
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: auto;
+        width: 90px;
+        height: 100vh;
+        transform: none;
+        background: linear-gradient(180deg, rgba(30, 30, 30, 0.98) 0%, rgba(20, 20, 20, 0.98) 100%);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 0;
+        border-right: 1px solid rgba(212, 175, 55, 0.2);
+        padding: 5.5rem 0 2rem 0; /* Space for fixed header at top */
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3),
+                    inset -1px 0 0 rgba(212, 175, 55, 0.1);
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 1rem;
+        z-index: 999;
+    }
+    
+    /* Admin button in desktop sidebar */
+    .bottom-nav .admin-nav-btn {
+        margin-top: auto; /* Push to bottom */
+        margin-bottom: 1rem;
+        padding: 1rem;
+        border-radius: 16px;
+        width: 70px;
+        height: 70px;
+        min-width: 70px;
+        background: transparent;
+        border: 2px solid rgba(212, 175, 55, 0.3);
+        color: var(--text-secondary);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+    
+    .bottom-nav .admin-nav-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 16px;
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .bottom-nav .admin-nav-btn:hover::before,
+    .bottom-nav .admin-nav-btn.active::before {
+        opacity: 1;
+    }
+    
+    .bottom-nav .admin-nav-btn:hover,
+    .bottom-nav .admin-nav-btn.active {
+        color: var(--primary-color);
+        transform: scale(1.1);
+        border-color: var(--primary-color);
+    }
+    
+    .bottom-nav .admin-nav-btn.active {
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.12) 100%);
+        box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+    }
+    
+    .bottom-nav .admin-nav-btn .nav-icon {
+        font-size: 1.6rem;
+        margin-bottom: 0.3rem;
+    }
+    
+    .bottom-nav .admin-nav-btn .nav-label {
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+    
+    /* Hide admin button from header on desktop */
+    #adminNavBtn {
+        display: none !important;
+    }
+
+    .bottom-nav.hidden {
+        transform: translateX(-100%);
+    }
+    
+    /* Light theme adjustments for desktop sidebar */
+    [data-theme="light"] .bottom-nav {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 248, 248, 0.98) 100%);
+        border-right: 1px solid rgba(204, 167, 0, 0.25);
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08),
+                    inset -1px 0 0 rgba(204, 167, 0, 0.15);
+    }
+    
+    [data-theme="light"] .bottom-nav .nav-btn.active {
+        background: linear-gradient(135deg, rgba(204, 167, 0, 0.15) 0%, rgba(204, 167, 0, 0.08) 100%);
+        box-shadow: 0 4px 20px rgba(204, 167, 0, 0.3);
+    }
+    
+    [data-theme="light"] .bottom-nav .nav-btn::before {
+        background: linear-gradient(135deg, rgba(204, 167, 0, 0.12) 0%, rgba(204, 167, 0, 0.06) 100%);
+    }
+    
+    [data-theme="light"] .bottom-nav .main-btn {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #B8941F 100%);
+        box-shadow: 0 8px 25px rgba(204, 167, 0, 0.4),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        border: 2px solid rgba(204, 167, 0, 0.4);
+    }
+    
+    [data-theme="light"] .bottom-nav .main-btn:hover {
+        box-shadow: 0 12px 35px rgba(204, 167, 0, 0.5),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        border-color: rgba(204, 167, 0, 0.6);
+    }
+    
+    [data-theme="light"] .bottom-nav .admin-nav-btn {
+        border: 2px solid rgba(204, 167, 0, 0.25);
+    }
+    
+    [data-theme="light"] .bottom-nav .admin-nav-btn:hover,
+    [data-theme="light"] .bottom-nav .admin-nav-btn.active {
+        border-color: var(--primary-color);
+    }
+    
+    [data-theme="light"] .bottom-nav .admin-nav-btn.active {
+        background: linear-gradient(135deg, rgba(204, 167, 0, 0.18) 0%, rgba(204, 167, 0, 0.1) 100%);
+        box-shadow: 0 4px 20px rgba(204, 167, 0, 0.3);
+    }
+
+    .nav-btn {
+        padding: 1rem;
+        border-radius: 16px;
+        width: 70px;
+        height: 70px;
+        min-width: 70px;
+        position: relative;
+        background: transparent;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+    }
+
+    .nav-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 16px;
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .nav-btn:hover::before {
+        opacity: 1;
+    }
+
+    .nav-btn:hover,
+    .nav-btn.active {
+        color: var(--primary-color);
+        transform: scale(1.1);
+    }
+
+    .nav-btn.active {
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.12) 100%);
+        box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-btn.active::before {
+        opacity: 1;
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(212, 175, 55, 0.15) 100%);
+    }
+
+    .nav-icon {
+        font-size: 1.6rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .nav-label {
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        text-align: center;
+    }
+
+    /* Main button in desktop nav */
+    .main-btn {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #B8941F 100%);
+        border-radius: 18px;
+        padding: 1rem;
+        width: 70px;
+        height: 70px;
+        min-width: 70px;
+        box-shadow: 0 8px 25px rgba(212, 175, 55, 0.5),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        transform: scale(1.05);
+        border: 2px solid rgba(212, 175, 55, 0.4);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .main-btn::before {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 18px;
+    }
+
+    .main-btn:hover {
+        transform: scale(1.15);
+        box-shadow: 0 12px 35px rgba(212, 175, 55, 0.6),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        border-color: rgba(212, 175, 55, 0.6);
+    }
+
+    .main-btn .nav-icon {
+        font-size: 1.8rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .main-btn .nav-label {
+        font-size: 0.65rem;
+        color: var(--bg-color);
+    }
+
+    /* Form improvements for desktop */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 1rem;
+        font-size: 1rem;
+        border-radius: 12px;
+    }
+
+    /* Button improvements */
+    .btn {
+        padding: 1rem 2rem;
+        font-size: 1rem;
+        border-radius: 12px;
+        font-weight: 600;
+    }
+
+    /* Modal improvements */
+    .modal-content {
+        max-width: 600px;
+        padding: 3rem;
+        border-radius: 20px;
+    }
+
+    /* Shop info improvements */
+    .shop-info {
+        margin-bottom: 3rem;
+    }
+
+    .shop-details {
+        padding: 2rem;
+    }
+
+    .shop-description {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        margin-bottom: 2rem;
+    }
+}
+
+/* ============================================
+   MOBILE NAVIGATION - ELEGANT DESIGN
+   ============================================ */
+@media (max-width: 767px) {
+    /* Show admin button in header on mobile */
+    #adminNavBtn {
+        display: flex !important;
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    
+    #adminNavBtn .label {
+        display: none;
+    }
+    
+    /* Hide admin button from mobile bottom nav */
+    .bottom-nav .admin-nav-btn,
+    .bottom-nav .admin-only,
+    .bottom-nav [data-page="adminDashboardPage"] {
+        display: none !important;
+    }
+    .bottom-nav {
+        left: 0;
+        transform: none;
+        width: 100%;
+        min-width: auto;
+        max-width: none;
+        border-radius: 25px 25px 0 0;
+        padding: 0.75rem 0.5rem 1rem;
+        margin: 0 10px 0 10px;
+        margin-bottom: 0;
+        background: linear-gradient(180deg, rgba(30, 30, 30, 0.98) 0%, rgba(20, 20, 20, 0.98) 100%);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4),
+                    0 0 0 1px rgba(212, 175, 55, 0.15),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        border-top: 1px solid rgba(212, 175, 55, 0.2);
+        border-left: 1px solid rgba(212, 175, 55, 0.1);
+        border-right: 1px solid rgba(212, 175, 55, 0.1);
+        width: calc(100% - 20px);
+    }
+
+    .bottom-nav.hidden {
+        transform: translateY(100%);
+    }
+
+    .nav-btn {
+        padding: 0.6rem 0.5rem;
+        border-radius: 16px;
+        min-width: auto;
+        background: transparent;
+        position: relative;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        flex: 1;
+        max-width: 80px;
+    }
+
+    .nav-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 0;
+        height: 0;
+        border-radius: 16px;
+        background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
+        transition: width 0.3s ease, height 0.3s ease;
+        z-index: 0;
+    }
+
+    .nav-btn:hover::before,
+    .nav-btn.active::before {
+        width: 50px;
+        height: 50px;
+    }
+
+    .nav-btn:hover,
+    .nav-btn.active {
+        transform: translateY(-3px);
+        color: var(--primary-color);
+    }
+
+    .nav-btn.active {
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(212, 175, 55, 0.06) 100%);
+    }
+
+    .nav-icon {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+        position: relative;
+        z-index: 1;
+        transition: transform 0.3s ease;
+    }
+
+    .nav-btn:hover .nav-icon,
+    .nav-btn.active .nav-icon {
+        transform: scale(1.15);
+    }
+
+    .nav-label {
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+        position: relative;
+        z-index: 1;
+        transition: color 0.3s ease;
+    }
+
+    .nav-btn.active .nav-label {
+        color: var(--primary-color);
+    }
+
+    /* Main button - Elegant floating design */
+    .main-btn {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #B8941F 100%);
+        border-radius: 20px;
+        padding: 0.85rem 1.25rem;
+        min-width: auto;
+        max-width: 90px;
+        box-shadow: 0 8px 25px rgba(212, 175, 55, 0.5),
+                    0 0 0 2px rgba(212, 175, 55, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        transform: translateY(-8px) scale(1.05);
+        border: 2px solid rgba(212, 175, 55, 0.4);
+        position: relative;
+        overflow: visible;
+    }
+
+    .main-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+        transition: width 0.4s ease, height 0.4s ease;
+        z-index: 0;
+    }
+
+    .main-btn:hover::before,
+    .main-btn:active::before {
+        width: 100px;
+        height: 100px;
+    }
+
+    .main-btn:hover {
+        transform: translateY(-10px) scale(1.08);
+        box-shadow: 0 12px 35px rgba(212, 175, 55, 0.6),
+                    0 0 0 3px rgba(212, 175, 55, 0.4),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        border-color: rgba(212, 175, 55, 0.5);
+    }
+
+    .main-btn:active {
+        transform: translateY(-6px) scale(1.05);
+    }
+
+    .main-btn .nav-icon {
+        font-size: 1.6rem;
+        position: relative;
+        z-index: 1;
+        margin-bottom: 0.25rem;
+        transition: transform 0.3s ease;
+    }
+
+    .main-btn:hover .nav-icon {
+        transform: scale(1.2) rotate(5deg);
+    }
+
+    .main-btn .nav-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        position: relative;
+        z-index: 1;
+        color: var(--bg-color);
+    }
+    
+    /* Light theme adjustments for mobile nav */
+    [data-theme="light"] .bottom-nav {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 248, 248, 0.98) 100%);
+        border-top: 1px solid rgba(204, 167, 0, 0.25);
+        border-left: 1px solid rgba(204, 167, 0, 0.15);
+        border-right: 1px solid rgba(204, 167, 0, 0.15);
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1),
+                    0 0 0 1px rgba(204, 167, 0, 0.2),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+    
+    [data-theme="light"] .bottom-nav .nav-btn.active {
+        background: linear-gradient(135deg, rgba(204, 167, 0, 0.15) 0%, rgba(204, 167, 0, 0.08) 100%);
+    }
+    
+    [data-theme="light"] .bottom-nav .nav-btn::before {
+        background: radial-gradient(circle, rgba(204, 167, 0, 0.18) 0%, transparent 70%);
+    }
+    
+    [data-theme="light"] .bottom-nav .main-btn {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #B8941F 100%);
+        box-shadow: 0 8px 25px rgba(204, 167, 0, 0.4),
+                    0 0 0 2px rgba(204, 167, 0, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        border: 2px solid rgba(204, 167, 0, 0.4);
+    }
+    
+    [data-theme="light"] .bottom-nav .main-btn:hover {
+        box-shadow: 0 12px 35px rgba(204, 167, 0, 0.5),
+                    0 0 0 3px rgba(204, 167, 0, 0.4),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        border-color: rgba(204, 167, 0, 0.5);
+    }
+    
+    [data-theme="light"] .bottom-nav .main-btn::before {
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, transparent 70%);
+    }
 }
 
 /* ===== Loading Indicator ===== */

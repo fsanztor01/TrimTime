@@ -105,7 +105,10 @@ export class DatabaseService {
                     hours: '09:00-17:00',
                     active: true,
                     rating: 4.5,
-                    photo: 'https://picsum.photos/seed/john/200/200.jpg'
+                    photo: 'https://picsum.photos/seed/john/200/200.jpg',
+                    description: currentLanguage === 'es' 
+                        ? 'Barbero con más de 10 años de experiencia especializado en cortes clásicos y modernos. Apasionado por la precisión y el detalle.'
+                        : 'Barber with over 10 years of experience specializing in classic and modern cuts. Passionate about precision and detail.'
                 },
                 {
                     id: 'barber-2',
@@ -116,7 +119,10 @@ export class DatabaseService {
                     hours: '10:00-18:00',
                     active: true,
                     rating: 4.8,
-                    photo: 'https://picsum.photos/seed/mike/200/200.jpg'
+                    photo: 'https://picsum.photos/seed/mike/200/200.jpg',
+                    description: currentLanguage === 'es'
+                        ? 'Especialista en barbas y afeitados tradicionales. Maestro en técnicas de navaja y cuidado facial premium.'
+                        : 'Specialist in beards and traditional shaves. Master in straight razor techniques and premium facial care.'
                 },
                 {
                     id: 'barber-3',
@@ -127,7 +133,10 @@ export class DatabaseService {
                     hours: '08:00-16:00',
                     active: true,
                     rating: 4.2,
-                    photo: 'https://picsum.photos/seed/david/200/200.jpg'
+                    photo: 'https://picsum.photos/seed/david/200/200.jpg',
+                    description: currentLanguage === 'es'
+                        ? 'Artista del estilo y diseño capilar. Crea looks únicos adaptados a la personalidad de cada cliente.'
+                        : 'Hair styling and design artist. Creates unique looks tailored to each client\'s personality.'
                 }
             ];
             localStorage.setItem('barbers', JSON.stringify(defaultBarbers));
@@ -177,21 +186,27 @@ export class DatabaseService {
         const translatedBarbers = [
             {
                 id: 'barber-1',
-                name: 'John Smith',
+                name: language === 'es' ? 'Juan García' : 'John Smith',
                 days: '1-5',
                 hours: '09:00-17:00',
                 active: true,
                 rating: 4.5,
-                photo: 'https://picsum.photos/seed/john/200/200.jpg'
+                photo: 'https://picsum.photos/seed/john/200/200.jpg',
+                description: language === 'es' 
+                    ? 'Barbero con más de 10 años de experiencia especializado en cortes clásicos y modernos. Apasionado por la precisión y el detalle.'
+                    : 'Barber with over 10 years of experience specializing in classic and modern cuts. Passionate about precision and detail.'
             },
             {
                 id: 'barber-2',
-                name: 'Mike Johnson',
+                name: language === 'es' ? 'Miguel Johnson' : 'Mike Johnson',
                 days: '2-6',
                 hours: '10:00-18:00',
                 active: true,
                 rating: 4.8,
-                photo: 'https://picsum.photos/seed/mike/200/200.jpg'
+                photo: 'https://picsum.photos/seed/mike/200/200.jpg',
+                description: language === 'es'
+                    ? 'Especialista en barbas y afeitados tradicionales. Maestro en técnicas de navaja y cuidado facial premium.'
+                    : 'Specialist in beards and traditional shaves. Master in straight razor techniques and premium facial care.'
             },
             {
                 id: 'barber-3',
@@ -200,7 +215,10 @@ export class DatabaseService {
                 hours: '08:00-16:00',
                 active: true,
                 rating: 4.2,
-                photo: 'https://picsum.photos/seed/david/200/200.jpg'
+                photo: 'https://picsum.photos/seed/david/200/200.jpg',
+                description: language === 'es'
+                    ? 'Artista del estilo y diseño capilar. Crea looks únicos adaptados a la personalidad de cada cliente.'
+                    : 'Hair styling and design artist. Creates unique looks tailored to each client\'s personality.'
             }
         ];
 
@@ -210,7 +228,8 @@ export class DatabaseService {
             if (translatedBarber) {
                 return {
                     ...barber,
-                    name: translatedBarber.name
+                    name: translatedBarber.name,
+                    description: translatedBarber.description
                 };
             }
             return barber;
