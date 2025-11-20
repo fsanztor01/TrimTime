@@ -826,6 +826,7 @@ body {
 .calendar-day {
     aspect-ratio: 1;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     border-radius: 5px;
@@ -833,10 +834,15 @@ body {
     transition: var(--transition);
     min-height: 40px;
     font-size: 0.9rem;
+    position: relative;
+    background-color: transparent;
+    border: 1px solid transparent;
+    box-sizing: border-box;
 }
 
 .calendar-day:hover {
     background-color: rgba(212, 175, 55, 0.2);
+    transform: none;
 }
 
 .calendar-day.today {
@@ -2404,16 +2410,16 @@ body {
 
     /* Calendar Mobile Styles */
     .calendar {
-        padding: 0.75rem;
+        padding: 0.5rem;
         margin-bottom: 1rem;
     }
 
     .calendar-header {
-        margin-bottom: 0.75rem;
+        margin-bottom: 0.5rem;
     }
 
     .calendar-header h3 {
-        font-size: 1rem;
+        font-size: 0.9rem;
     }
 
     .calendar-nav {
@@ -2421,23 +2427,58 @@ body {
     }
 
     .calendar-nav .btn {
-        padding: 0.4rem 0.75rem;
-        font-size: 0.8rem;
-    }
-
-    .calendar-grid {
-        gap: 0.2rem;
-    }
-
-    .calendar-day-header {
-        padding: 0.4rem 0.15rem;
+        padding: 0.35rem 0.6rem;
         font-size: 0.75rem;
     }
 
+    .calendar-grid {
+        gap: 0.15rem;
+    }
+
+    .calendar-day-header {
+        padding: 0.3rem 0.1rem;
+        font-size: 0.7rem;
+    }
+
     .calendar-day {
-        min-height: 35px;
-        font-size: 0.8rem;
-        border-radius: 4px;
+        aspect-ratio: 1 !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 32px !important;
+        max-height: none !important;
+        font-size: 0.7rem !important;
+        border-radius: 4px !important;
+        padding: 4px 2px !important;
+        margin: 0 !important;
+        border: 1px solid transparent !important;
+        box-sizing: border-box !important;
+        position: relative !important;
+        overflow: visible !important;
+    }
+
+    .calendar-day:hover {
+        background-color: rgba(212, 175, 55, 0.2) !important;
+        transform: none !important;
+        scale: none !important;
+    }
+
+    .day-number {
+        font-size: 0.7rem !important;
+        margin-bottom: 2px !important;
+        line-height: 1 !important;
+    }
+
+    .day-indicators {
+        gap: 2px !important;
+        margin-top: 2px !important;
+        flex-wrap: wrap !important;
+    }
+
+    .status-circle {
+        width: 8px !important;
+        height: 8px !important;
+        font-size: 6px !important;
+        flex-shrink: 0 !important;
     }
 
     /* Bottom Nav Mobile */
@@ -2525,31 +2566,66 @@ body {
 
     /* Calendar Small Mobile Styles */
     .calendar {
-        padding: 0.5rem;
+        padding: 0.4rem;
     }
 
     .calendar-header h3 {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
     }
 
     .calendar-nav .btn {
-        padding: 0.3rem 0.5rem;
-        font-size: 0.75rem;
-    }
-
-    .calendar-day-header {
-        padding: 0.3rem 0.1rem;
+        padding: 0.25rem 0.4rem;
         font-size: 0.7rem;
     }
 
+    .calendar-day-header {
+        padding: 0.25rem 0.08rem;
+        font-size: 0.65rem;
+    }
+
     .calendar-day {
-        min-height: 30px;
-        font-size: 0.75rem;
-        border-radius: 3px;
+        aspect-ratio: 1 !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 28px !important;
+        max-height: none !important;
+        font-size: 0.65rem !important;
+        border-radius: 3px !important;
+        padding: 3px 1px !important;
+        margin: 0 !important;
+        border: 1px solid transparent !important;
+        box-sizing: border-box !important;
+        position: relative !important;
+        overflow: visible !important;
+    }
+
+    .calendar-day:hover {
+        background-color: rgba(212, 175, 55, 0.2) !important;
+        transform: none !important;
+        scale: none !important;
+    }
+
+    .day-number {
+        font-size: 0.65rem !important;
+        margin-bottom: 1px !important;
+        line-height: 1 !important;
+    }
+
+    .day-indicators {
+        gap: 1px !important;
+        margin-top: 1px !important;
+        flex-wrap: wrap !important;
+    }
+
+    .status-circle {
+        width: 7px !important;
+        height: 7px !important;
+        font-size: 5px !important;
+        flex-shrink: 0 !important;
     }
 
     .calendar-grid {
-        gap: 0.15rem;
+        gap: 0.1rem;
     }
 
     /* Bottom Nav Small Mobile */
@@ -2618,59 +2694,69 @@ textarea:focus {
     top: 0;
 }
 
-.calendar-day {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    /* 🔹 Centra el número verticalmente */
-    padding: 6px 0;
-    width: 100px;
-    /* 🔹 Un poco más ancho */
-    height: 100px;
-    /* 🔹 Un poco más alto */
-    position: relative;
-    font-size: 15px;
-    /* 🔹 Número más visible */
-    border-radius: 6px;
-    transition: background 0.2s, transform 0.1s;
-    cursor: pointer;
+/* Desktop calendar day styles - only apply on larger screens */
+@media (min-width: 769px) {
+    .calendar-day {
+        aspect-ratio: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 4px;
+        min-height: 60px;
+        max-width: none;
+        position: relative;
+        font-size: 0.9rem;
+        border-radius: 6px;
+        transition: background 0.2s, transform 0.1s;
+        cursor: pointer;
+        box-sizing: border-box;
+        border: 1px solid transparent;
+    }
 }
 
-.calendar-day:hover {
-    background: rgba(255, 215, 0, 0.25);
-    /* 🔹 Hover dorado suave */
-    transform: scale(1.03);
-    /* 🔹 Pequeño efecto de zoom */
+/* Hover styles - only apply transform on desktop */
+@media (min-width: 769px) {
+    .calendar-day:hover {
+        background: rgba(255, 215, 0, 0.25);
+        transform: scale(1.03);
+    }
 }
 
-.day-number {
-    font-weight: 700;
-    font-size: 16px;
-    margin-bottom: 4px;
-    /* 🔹 Espacio entre número y círculos */
+/* Desktop day number styles - only apply on larger screens */
+@media (min-width: 769px) {
+    .day-number {
+        font-weight: 700;
+        font-size: 16px;
+        margin-bottom: 4px;
+    }
 }
 
-.day-indicators {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-    flex-wrap: wrap;
-    margin-top: 2px;
+/* Desktop day indicators styles - only apply on larger screens */
+@media (min-width: 769px) {
+    .day-indicators {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+        flex-wrap: wrap;
+        margin-top: 2px;
+    }
 }
 
-.status-circle {
-    width: 16px;
-    /* 🔹 Un poco más grandes */
-    height: 16px;
-    border-radius: 50%;
-    color: white;
-    font-size: 10px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* Desktop status circle styles - only apply on larger screens */
+@media (min-width: 769px) {
+    .status-circle {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        color: white;
+        font-size: 10px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 }
 
 #bottomNav,
@@ -2713,74 +2799,38 @@ main {
     min-width: 100%;
 }
 
-/* Celdas normales */
+/* Celdas normales - base styles */
 .calendar-day {
+    aspect-ratio: 1;
     background: var(--card-bg, #2c2c2c);
     border-radius: 6px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     color: var(--text-color, #fff);
     font-size: 0.8rem;
     transition: background 0.2s ease;
+    box-sizing: border-box;
+    border: 1px solid transparent;
+    position: relative;
+    overflow: visible;
 }
 
 /* ===== Versión móvil ===== */
 @media (max-width: 768px) {
     #adminCalendar {
-        padding: 0.75rem;
+        padding: 0.5rem;
         border-radius: 8px;
     }
 
     .admin-calendar {
-        padding: 0.75rem;
+        padding: 0.5rem;
     }
 
     .calendar-header {
-        margin-bottom: 0.75rem;
+        margin-bottom: 0.5rem;
         flex-wrap: wrap;
-    }
-
-    .calendar-header h3 {
-        font-size: 1rem;
-    }
-
-    .calendar-grid {
-        gap: 0.2rem;
-    }
-
-    .calendar-day {
-        padding: 4px 0;
-        min-height: 35px;
-        font-size: 0.75rem;
-        border-radius: 4px;
-    }
-
-    .day-number {
-        font-size: 0.85rem;
-        margin-bottom: 2px;
-    }
-
-    .day-indicators {
-        gap: 2px;
-        margin-top: 1px;
-    }
-
-    .status-circle {
-        width: 12px;
-        height: 12px;
-        font-size: 8px;
-    }
-}
-
-@media (max-width: 480px) {
-    #adminCalendar {
-        padding: 0.5rem;
-        border-radius: 6px;
-    }
-
-    .admin-calendar {
-        padding: 0.5rem;
     }
 
     .calendar-header h3 {
@@ -2788,14 +2838,32 @@ main {
     }
 
     .calendar-grid {
-        gap: 0.15rem;
+        gap: 0.2rem;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .calendar-day {
-        padding: 3px 0;
-        min-height: 30px;
-        font-size: 0.7rem;
-        border-radius: 3px;
+        aspect-ratio: 1 !important;
+        width: 100% !important;
+        height: auto !important;
+        padding: 4px 2px !important;
+        min-height: 32px !important;
+        max-height: none !important;
+        font-size: 0.7rem !important;
+        border-radius: 4px !important;
+        margin: 0 !important;
+        border: 1px solid transparent !important;
+        box-sizing: border-box !important;
+        position: relative !important;
+        overflow: visible !important;
+        background: var(--card-bg, #2c2c2c) !important;
+    }
+
+    .calendar-day:hover {
+        background-color: rgba(212, 175, 55, 0.2) !important;
+        transform: none !important;
+        scale: none !important;
     }
 
     .day-number {
@@ -2805,12 +2873,72 @@ main {
 
     .day-indicators {
         gap: 1px;
+        margin-top: 1px;
     }
 
     .status-circle {
         width: 10px;
         height: 10px;
         font-size: 7px;
+    }
+}
+
+@media (max-width: 480px) {
+    #adminCalendar {
+        padding: 0.4rem;
+        border-radius: 6px;
+    }
+
+    .admin-calendar {
+        padding: 0.4rem;
+    }
+
+    .calendar-header h3 {
+        font-size: 0.85rem;
+    }
+
+    .calendar-grid {
+        gap: 0.15rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .calendar-day {
+        aspect-ratio: 1 !important;
+        width: 100% !important;
+        height: auto !important;
+        padding: 3px 1px !important;
+        min-height: 28px !important;
+        max-height: none !important;
+        font-size: 0.65rem !important;
+        border-radius: 3px !important;
+        margin: 0 !important;
+        border: 1px solid transparent !important;
+        box-sizing: border-box !important;
+        position: relative !important;
+        overflow: visible !important;
+        background: var(--card-bg, #2c2c2c) !important;
+    }
+
+    .calendar-day:hover {
+        background-color: rgba(212, 175, 55, 0.2) !important;
+        transform: none !important;
+        scale: none !important;
+    }
+
+    .day-number {
+        font-size: 0.7rem;
+        margin-bottom: 1px;
+    }
+
+    .day-indicators {
+        gap: 1px;
+    }
+
+    .status-circle {
+        width: 8px;
+        height: 8px;
+        font-size: 6px;
     }
 }
 
@@ -3635,31 +3763,34 @@ button {
     box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
 }
 
-/* Calendar Day Hover */
-.calendar-day {
-    position: relative;
-    overflow: hidden;
-}
+/* Calendar Day Hover - Desktop only */
+@media (min-width: 769px) {
+    .calendar-day {
+        position: relative;
+        overflow: hidden;
+    }
 
-.calendar-day::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, rgba(212, 175, 55, 0.3) 0%, transparent 70%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
+    .calendar-day::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, rgba(212, 175, 55, 0.3) 0%, transparent 70%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+    }
 
-.calendar-day:hover::after {
-    opacity: 1;
-}
+    .calendar-day:hover::after {
+        opacity: 1;
+    }
 
-.calendar-day:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+    .calendar-day:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+    }
 }
 
 /* Tab Button Hover */
