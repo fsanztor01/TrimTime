@@ -501,20 +501,30 @@ body {
 .barbers-list {
     display: flex;
     overflow-x: auto;
+    overflow-y: visible;
     gap: 1.5rem;
     padding: 1rem 0;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .barbers-list::-webkit-scrollbar {
-    height: 6px;
+    height: 8px;
+    display: block;
 }
 
 .barbers-list::-webkit-scrollbar-thumb {
     background: var(--primary-color);
-    border-radius: 3px;
+    border-radius: 4px;
+}
+
+.barbers-list::-webkit-scrollbar-track {
+    background: var(--bg-color);
+    border-radius: 4px;
 }
 
 .barber-card {
@@ -701,29 +711,52 @@ body {
 /* Mobile: Services list with horizontal scroll */
 @media (max-width: 768px) {
     .services-grid {
-        display: flex;
-        flex-direction: row;
-        overflow-x: auto;
-        gap: 1rem;
-        padding: 1rem 0;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: thin;
+        display: flex !important;
+        flex-direction: row !important;
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        gap: 1rem !important;
+        padding: 1rem 0 !important;
+        scroll-snap-type: x mandatory !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: thin !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     .services-grid::-webkit-scrollbar {
-        height: 6px;
+        height: 8px !important;
+        display: block !important;
     }
 
     .services-grid::-webkit-scrollbar-thumb {
-        background: var(--primary-color);
-        border-radius: 3px;
+        background: var(--primary-color) !important;
+        border-radius: 4px !important;
     }
 
-    .service-card {
-        min-width: 280px;
-        flex-shrink: 0;
-        scroll-snap-align: start;
+    .services-grid::-webkit-scrollbar-track {
+        background: var(--bg-color) !important;
+        border-radius: 4px !important;
+    }
+
+    .services-grid .service-card {
+        min-width: 300px !important;
+        max-width: 300px !important;
+        flex-shrink: 0 !important;
+        flex-grow: 0 !important;
+        scroll-snap-align: start !important;
+        width: 300px !important;
+    }
+
+    .service-card h3,
+    .service-card p,
+    .service-card * {
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        text-overflow: clip !important;
+        overflow: visible !important;
     }
 }
 
@@ -1344,6 +1377,24 @@ body {
 
 .admin-tab-content {
     margin-top: 1.5rem;
+    width: 100%;
+    overflow: visible;
+}
+
+@media (max-width: 768px) {
+    .admin-tab-content {
+        overflow-x: visible !important;
+        overflow-y: visible !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .admin-tab-pane {
+        overflow-x: visible !important;
+        overflow-y: visible !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
 }
 
 .admin-tab-pane {
@@ -1378,40 +1429,59 @@ body {
 @media (max-width: 768px) {
     .admin-services-list,
     .admin-barbers-list {
-        display: flex;
-        flex-direction: row;
-        overflow-x: auto;
-        gap: 1rem;
-        padding: 1rem 0;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: thin;
+        display: flex !important;
+        flex-direction: row !important;
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        gap: 1rem !important;
+        padding: 1rem 0 !important;
+        scroll-snap-type: x mandatory !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: thin !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     .admin-services-list::-webkit-scrollbar,
     .admin-barbers-list::-webkit-scrollbar {
-        height: 6px;
+        height: 8px !important;
+        display: block !important;
     }
 
     .admin-services-list::-webkit-scrollbar-thumb,
     .admin-barbers-list::-webkit-scrollbar-thumb {
-        background: var(--primary-color);
-        border-radius: 3px;
+        background: var(--primary-color) !important;
+        border-radius: 4px !important;
     }
 
-    .admin-card {
-        min-width: 300px;
-        flex-shrink: 0;
-        scroll-snap-align: start;
+    .admin-services-list::-webkit-scrollbar-track,
+    .admin-barbers-list::-webkit-scrollbar-track {
+        background: var(--bg-color) !important;
+        border-radius: 4px !important;
+    }
+
+    .admin-services-list .admin-card,
+    .admin-barbers-list .admin-card {
+        min-width: 320px !important;
+        max-width: 320px !important;
+        flex-shrink: 0 !important;
+        flex-grow: 0 !important;
+        scroll-snap-align: start !important;
+        width: 320px !important;
     }
 
     .admin-card-header h3,
     .admin-card-header h4,
     .admin-card p,
-    .admin-card span {
-        white-space: normal;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
+    .admin-card span,
+    .admin-card div,
+    .admin-card * {
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        text-overflow: clip !important;
+        overflow: visible !important;
     }
 }
 
@@ -1420,6 +1490,11 @@ body {
     padding: 1.5rem;
     border-radius: 10px;
     box-shadow: var(--shadow);
+    box-sizing: border-box;
+}
+
+.admin-card * {
+    box-sizing: border-box;
 }
 
 .admin-card-header {
@@ -2462,9 +2537,7 @@ body {
         font-size: 0.85rem;
     }
 
-    .services-grid {
-        grid-template-columns: 1fr;
-    }
+    /* Services grid already handled by mobile styles above */
 
     .stats-container {
         grid-template-columns: 1fr;
@@ -2489,12 +2562,26 @@ body {
     }
 
     .barbers-list {
-        gap: 1rem;
+        gap: 1rem !important;
+        overflow-x: auto !important;
+        overflow-y: visible !important;
     }
 
     .barber-card {
-        min-width: 150px;
-        padding: 1rem;
+        min-width: 200px !important;
+        max-width: 200px !important;
+        flex-shrink: 0 !important;
+        flex-grow: 0 !important;
+        padding: 1rem !important;
+        width: 200px !important;
+    }
+
+    .barber-card * {
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        text-overflow: clip !important;
+        overflow: visible !important;
     }
 
     .barber-card img {
