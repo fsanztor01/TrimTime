@@ -1344,6 +1344,26 @@ body {
     margin-bottom: 1.5rem;
     border-bottom: 1px solid var(--border-color);
     overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.admin-tabs::-webkit-scrollbar {
+    height: 6px;
+    display: block;
+}
+
+.admin-tabs::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 3px;
+}
+
+.admin-tabs::-webkit-scrollbar-track {
+    background: var(--bg-color);
+    border-radius: 3px;
 }
 
 .admin-tab-btn {
@@ -1355,6 +1375,8 @@ body {
     transition: var(--transition);
     position: relative;
     white-space: nowrap;
+    flex-shrink: 0;
+    min-width: fit-content;
 }
 
 .admin-tab-btn:hover {
@@ -2544,8 +2566,38 @@ body {
     }
 
     .admin-tabs {
-        flex-wrap: nowrap;
-        overflow-x: auto;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: thin !important;
+        width: 100% !important;
+        margin-bottom: 1rem !important;
+    }
+
+    .admin-tabs::-webkit-scrollbar {
+        height: 8px !important;
+        display: block !important;
+    }
+
+    .admin-tabs::-webkit-scrollbar-thumb {
+        background: var(--primary-color) !important;
+        border-radius: 4px !important;
+    }
+
+    .admin-tabs::-webkit-scrollbar-track {
+        background: var(--bg-color) !important;
+        border-radius: 4px !important;
+    }
+
+    .admin-tab-btn {
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+        min-width: fit-content !important;
+        padding: 0.75rem 1rem !important;
+        font-size: 0.9rem !important;
+        text-overflow: clip !important;
+        overflow: visible !important;
     }
 
     .booking-navigation {
@@ -2697,6 +2749,41 @@ body {
 }
 
 @media (max-width: 480px) {
+    .admin-tabs {
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: thin !important;
+        width: 100% !important;
+        margin-bottom: 1rem !important;
+    }
+
+    .admin-tabs::-webkit-scrollbar {
+        height: 8px !important;
+        display: block !important;
+    }
+
+    .admin-tabs::-webkit-scrollbar-thumb {
+        background: var(--primary-color) !important;
+        border-radius: 4px !important;
+    }
+
+    .admin-tabs::-webkit-scrollbar-track {
+        background: var(--bg-color) !important;
+        border-radius: 4px !important;
+    }
+
+    .admin-tab-btn {
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+        min-width: fit-content !important;
+        padding: 0.7rem 0.9rem !important;
+        font-size: 0.85rem !important;
+        text-overflow: clip !important;
+        overflow: visible !important;
+    }
+
     .social-buttons {
         gap: 1rem;
     }
