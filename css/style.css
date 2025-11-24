@@ -722,13 +722,14 @@ body {
     .services-grid {
         display: grid !important;
         grid-template-columns: 1fr !important;
-        gap: 1rem !important;
+        gap: 1.5rem !important;
         padding: 0 !important;
         overflow-x: visible !important;
         overflow-y: visible !important;
         width: 100% !important;
         max-width: 100% !important;
         box-sizing: border-box !important;
+        margin-top: 2rem !important;
     }
 
     .service-card {
@@ -738,7 +739,12 @@ body {
         display: flex !important;
         flex-direction: column !important;
         position: relative !important;
-        overflow: visible !important;
+        overflow: hidden !important;
+        margin: 0 !important;
+        margin-bottom: 0 !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06) !important;
+        border: 1px solid rgba(212, 175, 55, 0.1) !important;
+        isolation: isolate !important;
     }
 
     .service-card img {
@@ -749,6 +755,8 @@ body {
         position: relative !important;
         z-index: 1 !important;
         border-radius: 10px 10px 0 0 !important;
+        margin: 0 !important;
+        flex-shrink: 0 !important;
     }
 
     .service-card-content {
@@ -759,6 +767,7 @@ body {
         border-radius: 0 0 10px 10px !important;
         margin-top: 0 !important;
         display: block !important;
+        flex: 1 1 auto !important;
     }
 
     .service-card h3,
@@ -775,6 +784,10 @@ body {
 
     .service-card::after {
         display: none !important;
+    }
+
+    .service-card:hover {
+        transform: none !important;
     }
 }
 
