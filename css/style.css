@@ -735,6 +735,30 @@ body {
         width: 100% !important;
         max-width: 100% !important;
         min-width: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        position: relative !important;
+        overflow: visible !important;
+    }
+
+    .service-card img {
+        width: 100% !important;
+        height: 180px !important;
+        object-fit: cover !important;
+        display: block !important;
+        position: relative !important;
+        z-index: 1 !important;
+        border-radius: 10px 10px 0 0 !important;
+    }
+
+    .service-card-content {
+        position: relative !important;
+        z-index: 2 !important;
+        background-color: var(--surface-color) !important;
+        padding: 1.5rem !important;
+        border-radius: 0 0 10px 10px !important;
+        margin-top: 0 !important;
+        display: block !important;
     }
 
     .service-card h3,
@@ -745,6 +769,12 @@ body {
         overflow-wrap: break-word !important;
         text-overflow: clip !important;
         overflow: visible !important;
+        position: relative !important;
+        z-index: 2 !important;
+    }
+
+    .service-card::after {
+        display: none !important;
     }
 }
 
