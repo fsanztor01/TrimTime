@@ -540,10 +540,13 @@ async function renderBarbers() {
                         starsHTML += '<span class="rating-star" style="opacity: 0.3">★</span>';
                     }
 
+                    // Always use Spanish name for barbers
+                    const barberName = barber.nameEs || barber.name || 'Barbero';
+                    
                     barberCard.innerHTML = `
-                        <img src="${barber.photo}" alt="${barber.name}">
+                        <img src="${barber.photo}" alt="${barberName}">
                         <div class="barber-info">
-                            <div class="barber-name">${barber.name}</div>
+                            <div class="barber-name">${barberName}</div>
                             <div class="barber-rating">
                                 ${starsHTML}
                                 <span class="rating-value">${barber.rating}</span>
@@ -635,13 +638,16 @@ function showBarberProfileModal(barber) {
         ? 'Barbero profesional con experiencia en diversos estilos.' 
         : 'Professional barber with experience in various styles.');
     
+    // Always use Spanish name for barbers
+    const barberName = barber.nameEs || barber.name || 'Barbero';
+    
     content.innerHTML = `
         <div class="barber-profile-modal">
             <div class="barber-profile-photo">
-                <img src="${barber.photo}" alt="${barber.name}">
+                <img src="${barber.photo}" alt="${barberName}">
             </div>
             <div class="barber-profile-info">
-                <h2 class="barber-profile-name">${barber.name}</h2>
+                <h2 class="barber-profile-name">${barberName}</h2>
                 <div class="barber-profile-rating">
                     ${starsHTML}
                     <span class="rating-value">${barber.rating.toFixed(1)}</span>
@@ -1342,7 +1348,11 @@ window.deleteService = async function (serviceId) {
 };
 
 window.editBarber = function (barberId) {
-    showToast('Edit barber functionality not implemented in this demo', 'warning');
+    if (typeof AdminController !== 'undefined') {
+        AdminController.showEditBarberModal(state, elements, barberId);
+    } else {
+        showToast('Admin controller not available', 'error');
+    }
 };
 
 window.toggleBarberStatus = async function (barberId) {

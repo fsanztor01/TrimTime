@@ -1065,6 +1065,154 @@ export class AdminController {
         }
     }
 
+    // =============== BARBEROS (EDITAR) ===============
+    static async showEditBarberModal(state, elements, barberId) {
+        const modal = document.getElementById('barberModal');
+        const content = document.getElementById('barberModalContent');
+        if (!modal || !content) return;
+
+        try {
+            const result = await DatabaseService.getBarbers();
+            if (!result.success) {
+                showToast('Error loading barber data', 'error');
+                return;
+            }
+
+            const barber = result.data.find(b => b.id === barberId);
+            if (!barber) {
+                showToast('Barber not found', 'error');
+                return;
+            }
+
+            const nameEn = barber.nameEn || barber.name || '';
+            const nameEs = barber.nameEs || barber.name || '';
+            const descEn = barber.descEn || barber.description || '';
+            const descEs = barber.descEs || barber.description || '';
+
+            content.innerHTML = `
+                <h2>${translations[state.currentLanguage]['admin.edit'] || 'Edit'} Barber</h2>
+                <form id="editBarberForm">
+                    <div class="form-group">
+                        <label for="editBarberNameEn">Barber Name (EN)</label>
+                        <input type="text" id="editBarberNameEn" value="${nameEn.replace(/"/g, '&quot;')}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editBarberNameEs">Nombre del Barbero (ES)</label>
+                        <input type="text" id="editBarberNameEs" value="${nameEs.replace(/"/g, '&quot;')}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editBarberDays">Working Days (1-7, where 1=Monday)</label>
+                        <input type="text" id="editBarberDays" placeholder="e.g., 1-5" value="${barber.days || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editBarberHours">Working Hours (e.g., 09:00-17:00)</label>
+                        <input type="text" id="editBarberHours" value="${barber.hours || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editBarberRating">Rating (0-5)</label>
+                        <input type="number" id="editBarberRating" min="0" max="5" step="0.1" value="${barber.rating || 4.5}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editBarberDescEn">Description (EN)</label>
+                        <textarea id="editBarberDescEn" rows="3" placeholder="Brief description about the barber...">${descEn}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="editBarberDescEs">Descripción (ES)</label>
+                        <textarea id="editBarberDescEs" rows="3" placeholder="Breve descripción sobre el barbero...">${descEs}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="editBarberPhoto">Barber Photo</label>
+                        <input type="file" id="editBarberPhoto" accept="image/*">
+                        <small>Upload a new photo to replace current one</small>
+                        <div id="editBarberPhotoPreview" style="margin-top: 10px;">
+                            <img id="editBarberPreviewImg" src="${barber.photo || ''}" alt="Current photo" style="max-width: 150px; max-height: 150px; border-radius: 50%; border: 2px solid var(--primary-color);">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="editBarberActive" ${barber.active ? 'checked' : ''}>
+                            <span>Active</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">${translations[state.currentLanguage]['admin.save'] || 'Save'}</button>
+                </form>
+            `;
+
+            modal.classList.add('active');
+
+            // Handle photo preview
+            const barberPhotoInput = document.getElementById('editBarberPhoto');
+            const barberPreviewImg = document.getElementById('editBarberPreviewImg');
+            
+            if (barberPhotoInput) {
+                barberPhotoInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            barberPreviewImg.src = event.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+            document.getElementById('editBarberForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                let photoData = barber.photo || `https://picsum.photos/seed/${barberId}/200/200.jpg`;
+                
+                // Handle photo upload
+                const photoFile = document.getElementById('editBarberPhoto')?.files[0];
+                if (photoFile && photoFile.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    photoData = await new Promise((resolve) => {
+                        reader.onload = (event) => resolve(event.target.result);
+                        reader.readAsDataURL(photoFile);
+                    });
+                }
+
+                const payload = {
+                    nameEn: document.getElementById('editBarberNameEn').value.trim(),
+                    nameEs: document.getElementById('editBarberNameEs').value.trim(),
+                    name: state.currentLanguage === 'es'
+                        ? document.getElementById('editBarberNameEs').value.trim()
+                        : document.getElementById('editBarberNameEn').value.trim(),
+                    days: document.getElementById('editBarberDays').value.trim(),
+                    hours: document.getElementById('editBarberHours').value.trim(),
+                    rating: parseFloat(document.getElementById('editBarberRating').value),
+                    photo: photoData,
+                    descEn: document.getElementById('editBarberDescEn').value.trim() || '',
+                    descEs: document.getElementById('editBarberDescEs').value.trim() || '',
+                    description: state.currentLanguage === 'es'
+                        ? document.getElementById('editBarberDescEs').value.trim()
+                        : document.getElementById('editBarberDescEn').value.trim(),
+                    active: document.getElementById('editBarberActive').checked
+                };
+
+                try {
+                    const res = await DatabaseService.updateBarber(barberId, payload);
+                    if (res.success) {
+                        showToast(translations[state.currentLanguage]['barberUpdated'] || 'Barber updated successfully', 'success');
+                        modal.classList.remove('active');
+                        AdminController.renderAdminBarbers(state, elements);
+                        if (window.renderBarbers) {
+                            window.renderBarbers();
+                        }
+                    } else {
+                        showToast(res.error || 'Error updating barber', 'error');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    showToast('Error updating barber', 'error');
+                }
+            });
+        } catch (e) {
+            console.error(e);
+            showToast('Error opening edit modal', 'error');
+        }
+    }
+
     // =============== BARBEROS (MODAL NUEVO) ===============
     static showAddBarberModal(state, elements) {
         const modal = document.getElementById('barberModal');

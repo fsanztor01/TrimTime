@@ -480,47 +480,71 @@
                     <div id="statsTab" class="admin-tab-pane">
                         <div class="stats-container">
                             <div class="stat-card">
-                                <h3 data-i18n="admin.totalAppointments">Total Appointments</h3>
+                                <div class="stat-card-header">
+                                    <h3 data-i18n="admin.totalAppointments">Total Appointments</h3>
+                                    <span class="stat-icon">📊</span>
+                                </div>
                                 <p id="totalAppointmentsCount" class="stat-value">0</p>
                             </div>
 
                             <div class="stat-card">
-                                <h3 data-i18n="admin.confirmedAppointments">Confirmed</h3>
+                                <div class="stat-card-header">
+                                    <h3 data-i18n="admin.confirmedAppointments">Confirmed</h3>
+                                    <span class="stat-icon">✅</span>
+                                </div>
                                 <p id="confirmedAppointmentsCount" class="stat-value">0</p>
                             </div>
 
                             <div class="stat-card">
-                                <h3 data-i18n="admin.completedAppointments">Completed</h3>
+                                <div class="stat-card-header">
+                                    <h3 data-i18n="admin.completedAppointments">Completed</h3>
+                                    <span class="stat-icon">🎯</span>
+                                </div>
                                 <p id="completedAppointmentsCount" class="stat-value">0</p>
                             </div>
 
                             <div class="stat-card">
-                                <h3 data-i18n="admin.cancellations">Cancellations</h3>
+                                <div class="stat-card-header">
+                                    <h3 data-i18n="admin.cancellations">Cancellations</h3>
+                                    <span class="stat-icon">❌</span>
+                                </div>
                                 <p id="cancellationsCount" class="stat-value">0</p>
                                 <p class="stat-detail">Rate: <span id="cancellationRate">0%</span></p>
                             </div>
 
                             <div class="stat-card">
-                                <h3 data-i18n="admin.totalRevenue">Total Revenue</h3>
+                                <div class="stat-card-header">
+                                    <h3 data-i18n="admin.totalRevenue">Total Revenue</h3>
+                                    <span class="stat-icon">💰</span>
+                                </div>
                                 <p id="totalRevenue" class="stat-value">$0</p>
                             </div>
 
                             <div class="stat-card">
-                                <h3 data-i18n="admin.topServices">Top Services</h3>
+                                <div class="stat-card-header">
+                                    <h3 data-i18n="admin.topServices">Top Services</h3>
+                                    <span class="stat-icon">⭐</span>
+                                </div>
                                 <ul id="topServicesList" class="stat-list">
                                     <!-- Se llenará dinámicamente -->
                                 </ul>
                             </div>
 
                             <div class="stat-card">
-                                <h3 data-i18n="admin.peakHours">Peak Hours</h3>
+                                <div class="stat-card-header">
+                                    <h3 data-i18n="admin.peakHours">Peak Hours</h3>
+                                    <span class="stat-icon">⏰</span>
+                                </div>
                                 <ul id="peakHoursList" class="stat-list">
                                     <!-- Se llenará dinámicamente -->
                                 </ul>
                             </div>
 
                             <div class="stat-card">
-                                <h3 data-i18n="admin.dateRange">Date Range</h3>
+                                <div class="stat-card-header">
+                                    <h3 data-i18n="admin.dateRange">Date Range</h3>
+                                    <span class="stat-icon">📅</span>
+                                </div>
                                 <div class="date-range-filters">
                                     <input type="date" id="statsDateFrom" class="form-control">
                                     <input type="date" id="statsDateTo" class="form-control">
