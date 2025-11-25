@@ -136,7 +136,7 @@ body {
 
 /* Admin button specific styles */
 #adminNavBtn {
-    display: flex;
+    display: none; /* Hidden by default, shown only for admin users */
     justify-content: center;
     align-items: center;
     position: absolute;
@@ -797,6 +797,7 @@ body {
     overflow: hidden;
     box-shadow: var(--shadow);
     transition: var(--transition);
+    cursor: pointer;
 }
 
 .service-card:hover {
@@ -2432,13 +2433,18 @@ body {
    MOBILE NAVIGATION - ELEGANT DESIGN
    ============================================ */
 @media (max-width: 767px) {
-    /* Show admin button in header on mobile */
+    /* Admin button hidden by default, shown only via JavaScript for admin users */
     #adminNavBtn {
-        display: flex !important;
+        display: none !important; /* Hidden by default */
         position: absolute;
         right: 20px;
         top: 50%;
         transform: translateY(-50%);
+    }
+    
+    /* Only show when explicitly enabled by JavaScript */
+    #adminNavBtn.show-admin {
+        display: flex !important;
     }
     
     #adminNavBtn .label {

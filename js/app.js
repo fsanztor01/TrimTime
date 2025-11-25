@@ -104,6 +104,7 @@ async function initializeApp() {
     if (savedUser) {
         state.currentUser = JSON.parse(savedUser);
         showUserInterface();
+        updateNavigation(); // Ensure admin button visibility is correct
     } else {
         showPage('loginPage');
         elements.bottomNav.classList.add('hidden');
@@ -112,6 +113,7 @@ async function initializeApp() {
         const adminBtn = document.getElementById('adminNavBtn');
         if (adminBtn) {
             adminBtn.style.display = 'none';
+            adminBtn.classList.remove('show-admin');
         }
     }
 
@@ -255,6 +257,19 @@ function showPage(pageId) {
         return;
     }
 
+    // Hide admin button on login/register pages
+    const adminBtn = document.getElementById('adminNavBtn');
+    if (pageId === 'loginPage' || pageId === 'registerPage') {
+        if (adminBtn) {
+            adminBtn.style.display = 'none';
+            adminBtn.classList.remove('show-admin');
+        }
+        const sidebarAdminBtn = document.querySelector('.admin-nav-btn');
+        if (sidebarAdminBtn) {
+            sidebarAdminBtn.remove();
+        }
+    }
+
     // Cancelar suscripciones anteriores
     if (state.realtimeUnsubscribe) {
         state.realtimeUnsubscribe();
@@ -292,12 +307,16 @@ function updateNavigation() {
     if (state.currentUser) {
         elements.bottomNav.classList.remove('hidden');
 
-        // Admin button visibility
+        // Admin button visibility - only show for admin@trimtime.com
         const adminBtn = document.getElementById('adminNavBtn');
         const isDesktop = window.innerWidth >= 768;
+        const isAdmin = state.currentUser.role === 'admin' && state.currentUser.email === 'admin@trimtime.com';
         
         if (adminBtn) {
-            if (state.currentUser.role === 'admin') {
+            // Always remove show-admin class first
+            adminBtn.classList.remove('show-admin');
+            
+            if (isAdmin) {
                 if (isDesktop) {
                     // Desktop: Add admin button to sidebar
                     addAdminButtonToSidebar();
@@ -305,7 +324,7 @@ function updateNavigation() {
                     adminBtn.style.display = 'none';
                 } else {
                     // Mobile: Show in header only (not in bottom nav)
-                    adminBtn.style.display = 'flex';
+                    adminBtn.classList.add('show-admin');
                     // Remove any admin button from mobile bottom nav if exists
                     const mobileAdminBtn = elements.bottomNav.querySelector('.admin-nav-btn, .admin-only, [data-page="adminDashboardPage"]');
                     if (mobileAdminBtn) {
@@ -330,6 +349,7 @@ function updateNavigation() {
             } else {
                 // Not admin - hide both
                 adminBtn.style.display = 'none';
+                adminBtn.classList.remove('show-admin');
                 const sidebarAdminBtn = document.querySelector('.admin-nav-btn');
                 if (sidebarAdminBtn) {
                     sidebarAdminBtn.remove();
@@ -356,6 +376,7 @@ function updateNavigation() {
         const adminBtn = document.getElementById('adminNavBtn');
         if (adminBtn) {
             adminBtn.style.display = 'none';
+            adminBtn.classList.remove('show-admin');
         }
         const sidebarAdminBtn = document.querySelector('.admin-nav-btn');
         if (sidebarAdminBtn) {
@@ -716,7 +737,6 @@ async function renderServices() {
         <img src="${service.img}" alt="${name}">
         <div class="service-card-content">
             <h3>${name}</h3>
-            <p>${desc}</p>
             <div class="service-meta">
                 <span>⏱️ ${service.duration} ${translations[state.currentLanguage]['booking.duration'] || 'min'}</span>
                 <span>$${service.price}</span>
@@ -756,18 +776,24 @@ function showServiceDetails(service) {
         const shortDesc = desc.length > 100 ? desc.substring(0, 100) + '...' : desc;
         const hasMore = desc.length > 100;
 
+        // Get name based on language
+        const name = service.nameEs && service.nameEn
+            ? (state.currentLanguage === 'es' ? service.nameEs : service.nameEn)
+            : service.name;
+
         content.innerHTML = `
-            <img src="${service.img}" alt="${service.name}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 5px; margin-bottom: 1rem;">
-            <h2>${service.name}</h2>
+            <img src="${service.img}" alt="${name}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 5px; margin-bottom: 1rem;">
+            <h2>${name}</h2>
             <div class="service-description">
                 <p class="service-desc-short">${shortDesc}</p>
                 ${hasMore ? `<p class="service-desc-full" style="display: none;">${desc}</p>` : ''}
                 ${hasMore ? `<button class="btn btn-secondary" id="toggleServiceDesc" style="margin-top: 0.5rem;">${translations[state.currentLanguage]['service.readMore'] || 'Read More'}</button>` : ''}
             </div>
-            <div class="service-meta" style="margin-top: 1rem;">
+            <div class="service-meta" style="margin-top: 1rem; display: flex; justify-content: space-between; font-weight: 600; font-size: 1rem;">
                 <span>⏱️ ${service.duration} ${translations[state.currentLanguage]['booking.duration'] || 'min'}</span>
                 <span>$${service.price}</span>
             </div>
+            <button class="btn btn-primary" id="bookServiceFromModal" style="margin-top: 1.5rem; width: 100%;">${translations[state.currentLanguage]['services.book'] || 'Book Now'}</button>
         `;
 
         modal.classList.add('active');
@@ -788,6 +814,22 @@ function showServiceDetails(service) {
                         shortDesc.style.display = 'block';
                         toggleBtn.textContent = translations[state.currentLanguage]['service.readMore'] || 'Read More';
                     }
+                }
+            });
+        }
+
+        // Handle "Book Now" button
+        const bookBtn = document.getElementById('bookServiceFromModal');
+        if (bookBtn) {
+            bookBtn.addEventListener('click', () => {
+                modal.classList.remove('active');
+                resetBookingData();
+                // Set the selected service
+                state.bookingData.service = service;
+                showPage('bookAppointmentPage');
+                // Re-render service selection to show selected service
+                if (window.BookingController) {
+                    BookingController.renderServiceSelection(state, elements);
                 }
             });
         }
